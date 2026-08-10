@@ -870,10 +870,17 @@ table.price-table tbody tr:hover{ background:var(--c-bg-cream); }
 .included-strip{
   background:var(--c-dark); color:#fff;
   border-radius:var(--radius-lg); padding:28px 32px;
-  display:grid; grid-template-columns:repeat(4,1fr); gap:16px;
 }
-@media (max-width:880px){ .included-strip{ grid-template-columns:repeat(2,1fr); } }
-@media (max-width:480px){ .included-strip{ grid-template-columns:1fr; } }
+.included-strip > .eyebrow{
+  color:var(--c-accent); margin:0 0 18px;
+}
+.included-strip .included-grid{
+  display:grid; grid-template-columns:repeat(4,1fr); gap:16px 24px; margin-top:0;
+}
+@media (max-width:880px){ .included-strip .included-grid{ grid-template-columns:repeat(2,1fr); } }
+@media (max-width:480px){ .included-strip .included-grid{ grid-template-columns:1fr; } }
+.included-strip .included-grid > div{ display:flex; align-items:flex-start; gap:8px; font-size:.92rem; line-height:1.4; }
+.included-strip .included-grid > div > span:first-child{ color:var(--c-success,#3fbf7f); font-weight:700; flex-shrink:0; }
 .incl-item{ display:flex; align-items:center; gap:10px; font-size:.88rem; color:rgba(255,255,255,.85); }
 .incl-item span.tick{ color:var(--c-success); font-weight:700; flex-shrink:0; }
 
