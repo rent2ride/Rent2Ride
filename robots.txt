@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://motion3d95.github.io/Rent2Ride/sitemap.xml
+Sitemap: https://rent2ride.github.io/Rent2Ride/sitemap.xml
