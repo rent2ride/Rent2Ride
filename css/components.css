@@ -609,18 +609,20 @@ table.price-table tbody tr:hover{ background:var(--c-bg-cream); }
 .newsletter-form input::placeholder { color: rgba(255,255,255,.45); }
 .newsletter-success { display: none; margin-top: 8px; color: var(--c-success); font-size: .85rem; }
 
+/* Alignement global de la grille */
 .footer-grid {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr;
   gap: 40px;
   margin-top: 40px;
   margin-bottom: 36px;
-  align-items: start !important; /* Force le haut du logo à s'aligner avec le haut des titres */
+  align-items: start !important;
   max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
 }
 
+/* Espacement du bloc marque */
 .footer-brand {
   display: flex;
   flex-direction: column;
@@ -628,13 +630,20 @@ table.price-table tbody tr:hover{ background:var(--c-bg-cream); }
   gap: 12px;
 }
 
-.footer-brand .logo,
-.footer-brand img {
+/* Force la hauteur exacte de 46px identique à galerie.html */
+.footer-brand img,
+.footer-brand .logo-full {
+  height: 46px !important;
+  width: auto !important;
+  max-width: 80px !important;
   margin: 0 !important;
   padding: 0 !important;
-  max-width: 80px;
-  height: auto;
   display: block;
+}
+
+/* Annule toute marge parasite sur le texte sous le logo */
+.footer-brand p {
+  margin-top: 0 !important;
 }
 
 .footer-grid p { color: rgba(255,255,255,.65) !important; }
