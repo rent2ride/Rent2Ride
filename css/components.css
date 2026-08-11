@@ -612,12 +612,25 @@ table.price-table tbody tr:hover{ background:var(--c-bg-cream); }
 .footer-grid {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr;
-  gap: 32px;
+  gap: 40px; /* Augmenté pour donner plus d'air entre les colonnes */
+  margin-top: 40px; /* Ajoute de l'espace au-dessus du logo sous la newsletter */
   margin-bottom: 36px;
-  /* Centrage de la grille de navigation */
+  align-items: start;
   max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
+}
+
+/* Espacement sous le logo et le texte d'accroche */
+.footer-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.footer-brand img {
+  max-width: 160px;
+  height: auto;
 }
 
 .footer-grid p { color: rgba(255,255,255,.65) !important; }
