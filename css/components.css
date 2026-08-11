@@ -1535,19 +1535,18 @@ body:has(#ridePlannerBar.is-visible){ padding-bottom:70px; }
 .field-row .field{ flex:1; }
 .field-note{ font-size:.78rem; color:var(--c-ink-faint); line-height:1.5; margin:-6px 0 16px; }
 
-/* Alignement vertical au centre du nav */
-.nav-links,
-.site-header nav,
-.header-nav {
+/* Fixe l'alignement vertical de la barre de navigation */
+.site-header .nav-links,
+nav .nav-links {
   display: flex !important;
   align-items: center !important;
 }
 
-/* Force tous les liens du menu sur une seule ligne */
-.nav-links a,
-.site-header nav a,
-.header-nav a {
+/* Force tous les liens du menu à rester sur une seule ligne */
+.site-header .nav-links a,
+nav .nav-links a {
   white-space: nowrap !important;
   display: inline-flex !important;
   align-items: center !important;
+  line-height: 1 !important;
 }
