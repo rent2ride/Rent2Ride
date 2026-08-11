@@ -402,22 +402,34 @@
 
 <!-- ================= FOOTER ================= -->
 <footer class="site-footer">
-  <div class="container">
+  <div class="footer-inner">
+    
+    <!-- BARRE NEWSLETTER -->
+    <div class="newsletter-bar">
       <div>
-        <form class="newsletter-form">
-          <input type="email" required placeholder="Votre e-mail" data-i18n-placeholder="newsletter_ph">
-          <button type="submit" class="btn btn-primary" data-i18n="newsletter_btn">S'inscrire</button>
-          <p class="newsletter-success" data-i18n="newsletter_success">Merci ! Vous êtes inscrit.</p>
-        </form>
+        <h5>Prêt à prendre la route ?</h5>
+        <p>Réservez en ligne en 2 minutes, sans engagement.</p>
       </div>
+      <form class="newsletter-form">
+        <input type="email" required placeholder="Votre e-mail" data-i18n-placeholder="newsletter_ph">
+        <button type="submit" class="btn btn-primary" data-i18n="newsletter_btn">S'inscrire</button>
+        <p class="newsletter-success" data-i18n="newsletter_success">Merci ! Vous êtes inscrit.</p>
+      </form>
     </div>
+
+    <!-- GRILLE DU FOOTER -->
     <div class="footer-grid">
-      <div>
+      
+      <!-- Colonne 1 : Logo & Infos -->
+      <div class="footer-brand">
         <div class="logo" style="margin-bottom:14px;">
-          <img src="./images/logo-signature.png" alt="Rent2Ride — Your Ride. Your Freedom." class="logo-full logo-full-white">
+          <span class="logo-mark"><img src="./images/logo-header.png" alt="Rent2Ride logo"></span>
+          <span class="logo-text"><strong style="color:#fff;">Rent2Ride</strong><span>Motorcycle Rental</span></span>
         </div>
-        <p data-i18n="footer_about">Location de motos premium sur la Costa del Sol.</p>
+        <p data-i18n="footer_about">Location de motos premium sur la Costa del Sol. Flotte Yamaha récente, assurance incluse, itinéraires sur-mesure.</p>
       </div>
+
+      <!-- Colonne 2 : Navigation -->
       <div>
         <h5 data-i18n="footer_nav_h">Navigation</h5>
         <ul>
@@ -432,15 +444,19 @@
           <li><a href="blog.html" data-i18n="nav_blog">Blog</a></li>
         </ul>
       </div>
+
+      <!-- Colonne 3 : Infos Légales -->
       <div>
         <h5 data-i18n="footer_legal_h">Informations légales</h5>
         <ul>
           <li><a href="assurance.html" data-i18n="nav_insurance">Assurance &amp; garanties</a></li>
           <li><a href="conditions.html" data-i18n="footer_legal_terms">Conditions de location</a></li>
-          <li><a href="confidentialite.html" data-i18n="footer_legal_privacy">Confidentialité</a></li>
-          <li><a href="confidentialite.html#cookies" data-i18n="footer_legal_cookies">Cookies</a></li>
+          <li><a href="#" data-i18n="footer_legal_privacy">Confidentialité</a></li>
+          <li><a href="#" data-i18n="footer_legal_cookies">Cookies</a></li>
         </ul>
       </div>
+
+      <!-- Colonne 4 : Contact -->
       <div>
         <h5 data-i18n="footer_contact_h">Contact</h5>
         <ul>
@@ -449,10 +465,14 @@
           <li>Barcelone, Espagne</li>
         </ul>
       </div>
+
     </div>
+
+    <!-- BAS DE PAGE -->
     <div class="footer-bottom">
       <span>&copy; 2026 Rent2Ride. <span data-i18n="footer_rights">Tous droits réservés.</span></span>
     </div>
+
   </div>
 </footer>
 
