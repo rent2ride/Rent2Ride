@@ -1543,8 +1543,8 @@ nav .nav-links {
 }
 
 /* Force tous les liens du menu à rester sur une seule ligne */
-.site-header .nav-links a,
-nav .nav-links a {
+.site-header .nav-links a:not(.nav-cta),
+nav .nav-links a:not(.nav-cta) {
   white-space: nowrap !important;
   display: inline-flex !important;
   align-items: center !important;
