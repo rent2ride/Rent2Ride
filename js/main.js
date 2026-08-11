@@ -1465,6 +1465,40 @@ function initBookingTimeSlots(){
   [pickupSelect, returnSelect].forEach(sel => sel.addEventListener("change", updateBookingSummary));
 }
 
+/* =========================================================
+   NEWSLETTER — soumission Formspree en AJAX (sans rechargement)
+   ---------------------------------------------------------*/
+function initNewsletterForm(){
+  document.querySelectorAll(".newsletter-form").forEach(form => {
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = form.querySelector("button[type='submit']");
+      const successMsg = form.querySelector(".newsletter-success");
+      const input = form.querySelector("input[type='email']");
+      const originalBtnText = btn ? btn.textContent : "";
+      if (btn) { btn.disabled = true; btn.textContent = "..."; }
+
+      try {
+        const res = await fetch(form.action, {
+          method: "POST",
+          body: new FormData(form),
+          headers: { "Accept": "application/json" }
+        });
+        if (res.ok) {
+          if (successMsg) successMsg.style.display = "block";
+          if (input) input.value = "";
+        } else {
+          alert("Une erreur est survenue, merci de réessayer.");
+        }
+      } catch (err) {
+        alert("Une erreur est survenue, merci de réessayer.");
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = originalBtnText; }
+      }
+    });
+  });
+}
+
 function initCookieBanner(){
   const banner = document.getElementById("cookieBanner");
   if (!banner) return;
@@ -1525,6 +1559,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initCart();
   initPriceCalculator();
   initCookieBanner();
+  initNewsletterForm();
   initHeroCarousel();
   initVideoParallax();
   initRidePlanner();
