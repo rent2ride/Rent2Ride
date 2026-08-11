@@ -570,33 +570,79 @@ table.price-table tbody tr:hover{ background:var(--c-bg-cream); }
 /* =========================================================
    FOOTER
    ========================================================= */
-.site-footer{ background:var(--c-dark); color:rgba(255,255,255,.7); padding:52px 0 28px; font-size:.88rem; }
-.newsletter-bar{
-  display:flex; flex-wrap:wrap; gap:24px; align-items:center; justify-content:space-between;
-  padding-bottom:40px; margin-bottom:40px; border-bottom:1px solid rgba(255,255,255,.12);
+.site-footer {
+  background: var(--c-dark);
+  color: rgba(255,255,255,.7);
+  padding: 52px 20px 28px; /* Ajout d'une marge interne sur les côtés */
+  font-size: .88rem;
 }
-.newsletter-bar h5{ font-family:var(--f-display); font-size:1.15rem; font-weight:600; color:#fff; margin:0 0 6px; }
-.newsletter-bar p{ margin:0; color:rgba(255,255,255,.65); }
-.newsletter-form{ display:flex; gap:10px; flex-wrap:wrap; }
-.newsletter-form input{
-  padding:12px 16px; border-radius:999px; border:1px solid rgba(255,255,255,.25);
-  background:rgba(255,255,255,.06); color:#fff; min-width:220px;
+
+/* Nouveau conteneur pour centrer et aligner le contenu du footer avec le reste du site */
+.site-footer .container,
+.footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
 }
-.newsletter-form input::placeholder{ color:rgba(255,255,255,.45); }
-.newsletter-success{ display:none; margin-top:8px; color:var(--c-success); font-size:.85rem; }
-.footer-grid{ display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:32px; margin-bottom:36px; }
-.footer-grid p{ color:rgba(255,255,255,.65) !important; }
-.footer-grid a{ color:rgba(255,255,255,.7); text-decoration:none; }
-@media (max-width:880px){ .footer-grid{ grid-template-columns:1fr 1fr; } }
-@media (max-width:560px){ .footer-grid{ grid-template-columns:1fr; } }
-.footer-grid h5{ color:#fff; font-size:.8rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase; margin:0 0 16px; }
-.footer-grid ul{ list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:9px; }
-.footer-grid a:hover{ color:#fff; }
-.footer-bottom{
-  border-top:1px solid rgba(255,255,255,.1); padding-top:22px;
-  display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; font-size:.8rem;
+
+.newsletter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 40px;
+  margin-bottom: 40px;
+  border-bottom: 1px solid rgba(255,255,255,.12);
+  /* Centrage de la section newsletter */
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
 }
-.footer-bottom a:hover{ color:#fff; }
+
+.newsletter-bar h5 { font-family: var(--f-display); font-size: 1.15rem; font-weight: 600; color: #fff; margin: 0 0 6px; }
+.newsletter-bar p { margin: 0; color: rgba(255,255,255,.65); }
+.newsletter-form { display: flex; gap: 10px; flex-wrap: wrap; }
+.newsletter-form input {
+  padding: 12px 16px; border-radius: 999px; border: 1px solid rgba(255,255,255,.25);
+  background: rgba(255,255,255,.06); color: #fff; min-width: 220px;
+}
+.newsletter-form input::placeholder { color: rgba(255,255,255,.45); }
+.newsletter-success { display: none; margin-top: 8px; color: var(--c-success); font-size: .85rem; }
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 32px;
+  margin-bottom: 36px;
+  /* Centrage de la grille de navigation */
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.footer-grid p { color: rgba(255,255,255,.65) !important; }
+.footer-grid a { color: rgba(255,255,255,.7); text-decoration: none; }
+@media (max-width:880px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width:560px) { .footer-grid { grid-template-columns: 1fr; } }
+
+.footer-grid h5 { color: #fff; font-size: .8rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; margin: 0 0 16px; }
+.footer-grid ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 9px; }
+.footer-grid a:hover { color: #fff; }
+
+.footer-bottom {
+  border-top: 1px solid rgba(255,255,255,.1);
+  padding-top: 22px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: .8rem;
+  /* Centrage de la barre du bas (copyright) */
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.footer-bottom a:hover { color: #fff; }
 
 /* =========================================================
    PAGE HERO (inner pages)
