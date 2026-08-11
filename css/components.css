@@ -621,11 +621,16 @@ table.price-table tbody tr:hover{ background:var(--c-bg-cream); }
   margin-right: auto;
 }
 
-/* Espacement sous le logo et le texte d'accroche */
+/* Fixe l'espace sous le logo de manière uniforme */
+.footer-brand .logo {
+  margin-bottom: 12px !important;
+}
+
+/* Ajuste l'écart vertical global dans la colonne */
 .footer-brand {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .footer-brand img {
