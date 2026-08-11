@@ -629,7 +629,7 @@ table.price-table tbody tr:hover{ background:var(--c-bg-cream); }
 }
 
 .footer-brand img {
-  max-width: 120px;
+  max-width: 80px;
   height: auto;
 }
 
