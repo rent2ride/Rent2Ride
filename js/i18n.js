@@ -1136,6 +1136,7 @@ const TRANSLATIONS = {
                           es: "Ofertas, nuevas rutas, promociones exclusivas — sin spam.",
                           en: "Good deals, new routes, exclusive offers — no spam." },
   newsletter_btn:     { fr: "S'inscrire", es: "Suscribirse", en: "Subscribe" },
+  newsletter_ph:      { fr: "Votre e-mail", es: "Tu correo electrónico", en: "Your email" },
   newsletter_success: { fr: "Merci ! Vous êtes inscrit.", es: "¡Gracias! Ya estás suscrito.", en: "Thanks! You're subscribed." },
 };
 
