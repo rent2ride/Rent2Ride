@@ -585,6 +585,8 @@ table.price-table tbody tr:hover{ background:var(--c-bg-cream); }
 .newsletter-form input::placeholder{ color:rgba(255,255,255,.45); }
 .newsletter-success{ display:none; margin-top:8px; color:var(--c-success); font-size:.85rem; }
 .footer-grid{ display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:32px; margin-bottom:36px; }
+.footer-grid p{ color:rgba(255,255,255,.65) !important; }
+.footer-grid a{ color:rgba(255,255,255,.7); text-decoration:none; }
 @media (max-width:880px){ .footer-grid{ grid-template-columns:1fr 1fr; } }
 @media (max-width:560px){ .footer-grid{ grid-template-columns:1fr; } }
 .footer-grid h5{ color:#fff; font-size:.8rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase; margin:0 0 16px; }
