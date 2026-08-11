@@ -63,6 +63,17 @@ const WHATSAPP_NUMBER = "33688133895";
    ça arrivait, il suffit de régénérer un nouveau token via
    @BotFather (/revoke) pour couper l'accès à l'ancien.
    ========================================================= */
+
+/* =========================================================
+   NOTIFICATION TELEGRAM AUTOMATIQUE — COMMANDES BOUTIQUE
+   ---------------------------------------------------------
+   ... (commentaire explicatif) ...
+   ========================================================= */
+   
+/* Formspree Endpoint ID */
+const FORMSPREE_ENDPOINT = "https://formspree.io/f/xvkpadnq";
+
+/* Telegram Bot Token (optionnel) */
 const TELEGRAM_BOT_TOKEN = "8829634456:AAFhfclUyKdM8zH1r4R5ylZvyHZ-0gAHjxQ";
 const TELEGRAM_CHAT_ID = "-1004485459396";
 
@@ -424,8 +435,6 @@ function buildBookingSummaryText(form, modelKey){
 }
 
 function initBookingForm(){
-
-
   const form = document.getElementById("bookingForm");
   if (!form) return;
 
@@ -433,7 +442,6 @@ function initBookingForm(){
   if (modelSelect){
     modelSelect.addEventListener("change", updateBookingSummary);
 
-    // Pre-select model if arriving from a "Book this bike" link (?model=mt09)
     const params = new URLSearchParams(window.location.search);
     const requestedModel = params.get("model");
     if (requestedModel && PRICING[requestedModel]){
@@ -441,7 +449,7 @@ function initBookingForm(){
     }
   }
 
-  form.addEventListener("submit", e => {
+  form.addEventListener("submit", async e => {
     e.preventDefault();
     const success = document.getElementById("bookingSuccess");
     const warning = document.getElementById("bookingWarning");
@@ -455,31 +463,65 @@ function initBookingForm(){
     }
     if (warning) warning.classList.remove("show");
 
-    /* ---------------------------------------------------
-       Enregistre la réservation localement, pour que le
-       système de disponibilité (voir AVAILABILITY plus bas)
-       puisse griser automatiquement la moto sur les pages
-       catalogue.html et index.html pendant ces dates.
-       --------------------------------------------------- */
     saveBooking(modelSelect.value, selectedRange.start, selectedRange.end);
 
-    /* ---------------------------------------------------
-       Envoi de la demande — même circuit que la boutique :
-       Telegram (automatique, silencieux) + WhatsApp + e-mail
-       (le client doit confirmer l'envoi de son côté pour ces
-       deux derniers, c'est une limite de WhatsApp/mailto, pas
-       du code).
-       --------------------------------------------------- */
+    const modelKey = modelSelect.value;
+    const model = PRICING[modelKey];
+    const modelName = model ? (TRANSLATIONS[model.key] ? TRANSLATIONS[model.key]["fr"] : modelKey) : modelKey;
+    const days = getNumberOfDays();
+    const { total } = calculateTotal(modelKey, days);
+
+    const name = form.querySelector("#fullName")?.value.trim() || "";
+    const email = form.querySelector("#email")?.value.trim() || "";
+    const phone = form.querySelector("#phone")?.value.trim() || "";
+    const pickupTime = form.querySelector("#pickupTime")?.value || "";
+    const returnTime = form.querySelector("#returnTime")?.value || "";
+
+    let hoursFee = 0;
+    if (pickupTime === "off-hours") hoursFee += OFF_HOURS_FEE;
+    if (returnTime === "off-hours") hoursFee += OFF_HOURS_FEE;
+
+    let finalTotal = total + hoursFee;
+    if (appliedPromoCode && PROMO_CODES[appliedPromoCode] && total > 0){
+      const pct = PROMO_CODES[appliedPromoCode];
+      const discountAmount = Math.round(total * pct / 100);
+      finalTotal = total - discountAmount + hoursFee;
+    }
+
+    // Objet envoyé à Formspree
+    const bookingPayload = {
+      type_demande: "Réservation Moto",
+      moto: modelName,
+      date_depart: formatBookingDate(selectedRange.start),
+      date_retour: formatBookingDate(selectedRange.end),
+      duree_jours: days,
+      heure_depart: pickupTime === "off-hours" ? "Hors créneaux standards" : pickupTime,
+      heure_retour: returnTime === "off-hours" ? "Hors créneaux standards" : returnTime,
+      code_promo: appliedPromoCode || "Aucun",
+      total_estime: `${finalTotal} €`,
+      nom_complet: name,
+      email: email,
+      telephone: phone
+    };
+
+    try {
+      await fetch(FORMSPREE_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify(bookingPayload)
+      });
+    } catch (err) {
+      console.error("Erreur d'envoi Formspree réservation:", err);
+    }
+
     const summary = buildBookingSummaryText(form, modelSelect.value);
     sendTelegramNotification(summary);
 
     const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(summary)}`;
     window.open(waUrl, "_blank", "noopener");
-
-    const subject = encodeURIComponent("Demande de réservation Rent2Ride");
-    const body = encodeURIComponent(summary);
-    const mailtoUrl = `mailto:info@rent2ride.com?subject=${subject}&body=${body}`;
-    setTimeout(() => { window.location.href = mailtoUrl; }, 400);
 
     if (success) success.classList.add("show");
     const printBtn = document.getElementById("printConfirmBtn");
@@ -1086,7 +1128,7 @@ function buildOrderSummaryText(name, contact, address, note){
   return text;
 }
 
-function handleCheckoutSubmit(){
+async function handleCheckoutSubmit(){
   const nameEl = document.getElementById("checkoutName");
   const emailEl = document.getElementById("checkoutEmail");
   const phoneEl = document.getElementById("checkoutPhone");
@@ -1106,36 +1148,55 @@ function handleCheckoutSubmit(){
   }
   if (errorEl) errorEl.style.display = "none";
 
+  const lang = getCurrentLang();
+  const cart = getCart();
+
+  const articlesList = cart.map(item => {
+    const product = SHOP_PRODUCTS[item.productId];
+    const pname = TRANSLATIONS[product.nameKey] ? TRANSLATIONS[product.nameKey][lang] : item.productId;
+    const variantBits = [];
+    if (item.size) variantBits.push(item.productId === "giftcard" ? `${item.size} €` : item.size);
+    if (item.color) variantBits.push(colorLabel(item.color, lang));
+    const variant = variantBits.length ? ` (${variantBits.join(", ")})` : "";
+    return `${item.qty}x ${pname}${variant} - ${formatPrice(item.price * item.qty)}`;
+  }).join("\n");
+
+  const orderPayload = {
+    type_demande: "Commande Boutique Merchandise",
+    nom_client: name,
+    email: email,
+    telephone: phone,
+    adresse_livraison: address || "Non renseignée",
+    note: note || "Aucune",
+    articles: articlesList,
+    total_commande: formatPrice(cartTotal())
+  };
+
+  try {
+    await fetch(FORMSPREE_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify(orderPayload)
+    });
+  } catch (err) {
+    console.error("Erreur d'envoi Formspree boutique:", err);
+  }
+
   const contact = [email, phone].filter(Boolean).join(" / ");
   const summary = buildOrderSummaryText(name, contact, address, note);
 
-  /* ============ STRIPE INTEGRATION POINT ============
-     Ici, à terme, on remplacera le code WhatsApp/e-mail ci-dessous
-     par quelque chose comme :
-
-     const res = await fetch("https://votre-backend/create-checkout-session", {
-       method: "POST",
-       headers: { "Content-Type": "application/json" },
-       body: JSON.stringify({ cart: getCart(), name, email, phone, address, note })
-     });
-     const session = await res.json();
-     window.location.href = session.url; // redirige vers le paiement Stripe
-     ===================================================== */
-
-  /* 1. Notifie automatiquement le groupe Telegram — aucune action du
-        client requise, ça part tout seul en arrière-plan. */
   sendTelegramNotification(summary);
 
-  /* 2. Ouvre WhatsApp dans un nouvel onglet avec le récap pré-rempli */
   const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(summary)}`;
   window.open(waUrl, "_blank", "noopener");
 
-  /* 3. Prépare l'e-mail — léger délai pour laisser le temps à l'onglet
-        WhatsApp de s'ouvrir avant de faire naviguer l'onglet actuel */
-  const subject = encodeURIComponent("Commande boutique Rent2Ride");
-  const body = encodeURIComponent(summary);
-  const mailtoUrl = `mailto:info@rent2ride.com?subject=${subject}&body=${body}`;
-  setTimeout(() => { window.location.href = mailtoUrl; }, 400);
+  alert("Votre commande a bien été envoyée !");
+  saveCart([]);
+  renderCartDrawer();
+  closeCartDrawer();
 }
 
 function getSelectedVariant(card, productId){
