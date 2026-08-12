@@ -764,6 +764,28 @@ function refreshAvailabilityBadges(){
         : TRANSLATIONS.bike_cta[lang];
     }
   });
+
+  /* Boutons "Réserver ce modèle" du tableau comparateur (bas de
+     catalogue.html) : même logique, grisés/désactivés et non
+     cliquables si le modèle est indisponible. */
+  document.querySelectorAll(".compare-table [data-model]").forEach(el => {
+    const model = el.dataset.model;
+    const unavailable = isModelUnavailable(model);
+    const lang = getCurrentLang();
+
+    el.classList.toggle("is-disabled", unavailable);
+    el.style.opacity = unavailable ? ".5" : "";
+    el.style.pointerEvents = unavailable ? "none" : "";
+    el.style.cursor = unavailable ? "not-allowed" : "";
+    el.textContent = unavailable
+      ? TRANSLATIONS.bike_unavailable_btn[lang]
+      : TRANSLATIONS.bike_cta[lang];
+    if (unavailable){
+      el.removeAttribute("href");
+    } else if (!el.getAttribute("href")){
+      el.setAttribute("href", `reservation.html?model=${model}#booking`);
+    }
+  });
 }
 
 /* Compteur global "X modèles disponibles aujourd'hui" (page Catalogue) */
