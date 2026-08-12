@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="merci_title">Merci - Rent2Ride</title>
+<meta name="description" content="Votre demande a bien été reçue par Rent2Ride.">
+<meta name="robots" content="noindex, follow">
+<link rel="canonical" href="https://rent2ride.github.io/Rent2Ride/merci.html">
+
+<!-- ⚠️ À REMPLACER : colle ici les <link> exacts de ton index.html
+     (favicon, styles.css, components.css, fonts, etc.) -->
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/components.css">
+
+<style>
+  /* Styles de secours si components.css ne couvre pas cette page */
+  .merci-section{
+    min-height:70vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:60px 20px;
+  }
+  .merci-box{
+    max-width:560px;
+  }
+  .merci-icon{
+    width:72px;
+    height:72px;
+    margin:0 auto 24px;
+    border-radius:50%;
+    background:var(--color-primary, #1a1a1a);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .merci-icon svg{ width:36px; height:36px; stroke:#fff; }
+  .merci-box h1{ margin-bottom:12px; font-size:1.8rem; }
+  .merci-box p{ margin-bottom:8px; color:#555; line-height:1.5; }
+  .merci-ref{
+    display:inline-block;
+    margin:16px 0 24px;
+    padding:8px 16px;
+    background:#f4f4f4;
+    border-radius:6px;
+    font-family:monospace;
+    font-size:0.95rem;
+  }
+  .merci-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    justify-content:center;
+    margin-top:8px;
+  }
+  .merci-actions a{
+    padding:12px 22px;
+    border-radius:6px;
+    text-decoration:none;
+    font-weight:600;
+    font-size:0.95rem;
+  }
+  .btn-primary{ background:var(--color-primary,#1a1a1a); color:#fff; }
+  .btn-secondary{ background:#fff; color:#1a1a1a; border:1px solid #ccc; }
+</style>
+</head>
+<body>
+
+<!-- ⚠️ À REMPLACER : colle ici ton <header> exact (logo, menu, sélecteur de langue) -->
+<header id="site-header"></header>
+
+<main>
+  <section class="merci-section">
+    <div class="merci-box">
+      <div class="merci-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+
+      <h1 data-i18n="merci_heading">Merci pour votre demande !</h1>
+
+      <p data-i18n="merci_text1">
+        Votre commande / réservation a bien été enregistrée.
+        Notre équipe s'en occupe et vous recontacte au plus vite,
+        généralement sous quelques heures.
+      </p>
+
+      <p data-i18n="merci_text2">
+        Vous recevrez une confirmation par WhatsApp et par email.
+      </p>
+
+      <!-- Numéro de référence optionnel, injecté par ton JS de réservation/boutique
+           (ex: via ?ref=XXXX dans l'URL de redirection) -->
+      <div class="merci-ref" id="merci-ref" style="display:none;">
+        <span data-i18n="merci_ref_label">Référence :</span> <span id="merci-ref-value"></span>
+      </div>
+
+      <div class="merci-actions">
+        <a href="https://wa.me/33688133895" class="btn-primary" target="_blank" rel="noopener">
+          <span data-i18n="merci_whatsapp">Nous écrire sur WhatsApp</span>
+        </a>
+        <a href="index.html" class="btn-secondary" data-i18n="merci_home">Retour à l'accueil</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ⚠️ À REMPLACER : colle ici ton <footer> exact -->
+<footer id="site-footer"></footer>
+
+<!-- ⚠️ À REMPLACER : garde tes vrais scripts (i18n.js, cookie banner, etc.) dans le même ordre que sur tes autres pages -->
+<script src="js/i18n.js"></script>
+<script>
+  // Affiche la référence de commande/réservation si elle est passée en paramètre d'URL
+  // Exemple d'appel depuis reservation.html ou boutique : merci.html?ref=RES-20260812-01
+  (function() {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('ref');
+    if (ref) {
+      document.getElementById('merci-ref-value').textContent = ref;
+      document.getElementById('merci-ref').style.display = 'inline-block';
+    }
+  })();
+</script>
+
+</body>
+</html>
