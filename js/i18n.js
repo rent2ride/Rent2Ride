@@ -173,7 +173,7 @@ const TRANSLATIONS = {
 
   bike_cta:       { fr: "Réserver ce modèle", es: "Reservar este modelo", en: "Book this bike" },
   status_available:   { fr: "Disponible", es: "Disponible", en: "Available" },
-  status_unavailable: { fr: "Actuellement loué", es: "Actualmente alquilada", en: "Currently rented" },
+  status_unavailable: { fr: "Pas disponible actuellement", es: "No disponible actualmente", en: "Not currently available" },
   bike_unavailable_btn: { fr: "Indisponible", es: "No disponible", en: "Unavailable" },
   per_day:        { fr: "/ jour", es: "/ día", en: "/ day" },
   view_all_fleet: { fr: "Voir tout le catalogue", es: "Ver todo el catálogo", en: "View full catalogue" },

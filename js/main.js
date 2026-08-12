@@ -210,6 +210,24 @@ let calendarViewDate = new Date();
 calendarViewDate.setDate(1);
 let selectedRange = { start: null, end: null };
 
+/* Noms de mois et abréviations de jours (lundi en premier, car
+   renderCalendar() calcule le décalage du 1er du mois sur cette
+   base). Utilisé uniquement par le calendrier de réservation. */
+const CALENDAR_STRINGS = {
+  fr: {
+    months: ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"],
+    days: ["Lu","Ma","Me","Je","Ve","Sa","Di"],
+  },
+  es: {
+    months: ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"],
+    days: ["Lu","Ma","Mi","Ju","Vi","Sá","Do"],
+  },
+  en: {
+    months: ["January","February","March","April","May","June","July","August","September","October","November","December"],
+    days: ["Mo","Tu","We","Th","Fr","Sa","Su"],
+  },
+};
+
 function pad(n){ return n.toString().padStart(2,"0"); }
 function toISO(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
 function isSameDay(a,b){ return a && b && a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
