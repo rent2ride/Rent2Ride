@@ -172,6 +172,9 @@ const TRANSLATIONS = {
   bike_tracer9_f3:   { fr: "Régulateur de vitesse", es: "Control de crucero", en: "Cruise control" },
 
   bike_cta:       { fr: "Réserver ce modèle", es: "Reservar este modelo", en: "Book this bike" },
+  newsletter_ph:      { fr: "Votre e-mail", es: "Tu correo electrónico", en: "Your email" },
+  newsletter_btn:      { fr: "S'inscrire", es: "Suscribirse", en: "Subscribe" },
+  newsletter_success:  { fr: "Merci ! Vous êtes inscrit.", es: "¡Gracias! Ya estás suscrito.", en: "Thanks! You're subscribed." },
   status_available:   { fr: "Disponible", es: "Disponible", en: "Available" },
   status_unavailable: { fr: "Pas disponible actuellement", es: "No disponible actualmente", en: "Not currently available" },
   bike_unavailable_btn: { fr: "Indisponible", es: "No disponible", en: "Unavailable" },
@@ -870,5 +873,54 @@ const TRANSLATIONS = {
   cart_title:        { fr: "Votre panier", es: "Tu carrito", en: "Your cart" },
   cart_empty:        { fr: "Votre panier est vide.", es: "Tu carrito está vacío.", en: "Your cart is empty." },
   cart_empty_cta:    { fr: "Voir la boutique", es: "Ver la tienda", en: "Browse the shop" },
-  cart_subtotal:     { fr: "Sous-total", es: "Subtotal", en: "Subtotal" }
+  cart_subtotal:     { fr: "Sous-total", es: "Subtotal", en: "Subtotal" },
+
+  /* ---------------- BLOG — listing (blog.html) et articles ---------------- */
+  bpm_eyebrow:  { fr: "PRATIQUE", es: "PRÁCTICO", en: "PRACTICAL" },
+  bpm_title:    { fr: "Quel permis pour louer une moto en Espagne ?",
+                  es: "¿Qué carnet se necesita para alquilar una moto en España?",
+                  en: "Which licence do you need to rent a motorcycle in Spain?" },
+  bpm_subtitle: { fr: "A2, A ou permis international : ce qu'il faut savoir avant de réserver.",
+                  es: "A2, A o carnet internacional: lo que debes saber antes de reservar.",
+                  en: "A2, A, or an international licence: what you need to know before booking." },
+
+  brt_eyebrow:  { fr: "ITINÉRAIRES", es: "ITINERARIOS", en: "ITINERARIES" },
+  brt_title:    { fr: "Les 5 plus belles routes moto d'Andalousie",
+                  es: "Las 5 rutas en moto más bonitas de Andalucía",
+                  en: "The 5 most beautiful motorcycle routes in Andalusia" },
+  brt_subtitle: { fr: "Notre sélection, testée et approuvée par notre équipe sur place.",
+                  es: "Nuestra selección, probada y aprobada por nuestro equipo sobre el terreno.",
+                  en: "Our selection, tested and approved by our team on the ground." },
+
+  b3j_eyebrow:  { fr: "ITINÉRAIRES", es: "ITINERARIOS", en: "ITINERARIES" },
+  b3j_title:    { fr: "Costa del Sol en moto : notre itinéraire sur 3 jours",
+                  es: "Costa del Sol en moto: nuestro itinerario de 3 días",
+                  en: "Costa del Sol by motorcycle: our 3-day itinerary" },
+  b3j_subtitle: { fr: "Un parcours testé par notre équipe, jour par jour, entre littoral et montagne.",
+                  es: "Un recorrido probado por nuestro equipo, día a día, entre costa y montaña.",
+                  en: "A route tested by our team, day by day, between coast and mountains." },
+
+  blm_eyebrow:  { fr: "PRATIQUE", es: "PRÁCTICO", en: "PRACTICAL" },
+  blm_title:    { fr: "Louer une moto à Marbella ou Malaga : le guide complet",
+                  es: "Alquilar una moto en Marbella o Málaga: la guía completa",
+                  en: "Renting a motorcycle in Marbella or Malaga: the complete guide" },
+  blm_subtitle: { fr: "Récupération, documents, délais : tout ce qu'il faut savoir avant de venir chercher votre moto.",
+                  es: "Recogida, documentos, plazos: todo lo que debes saber antes de venir a buscar tu moto.",
+                  en: "Pick-up, documents, timing: everything you need to know before collecting your bike." },
+
+  bas_eyebrow:  { fr: "PRATIQUE", es: "PRÁCTICO", en: "PRACTICAL" },
+  bas_title:    { fr: "Assurance location moto en Espagne : ce qui est vraiment inclus",
+                  es: "Seguro de alquiler de moto en España: lo que realmente incluye",
+                  en: "Motorcycle rental insurance in Spain: what's actually included" },
+  bas_subtitle: { fr: "Responsabilité civile, dommages, franchise : on vous dit ce que couvre réellement votre location.",
+                  es: "Responsabilidad civil, daños, franquicia: te explicamos lo que cubre realmente tu alquiler.",
+                  en: "Third-party liability, damage, excess: we explain what your rental really covers." },
+
+  bpx_eyebrow:  { fr: "PRATIQUE", es: "PRÁCTICO", en: "PRACTICAL" },
+  bpx_title:    { fr: "Combien coûte la location d'une moto sur la Costa del Sol ?",
+                  es: "¿Cuánto cuesta alquilar una moto en la Costa del Sol?",
+                  en: "How much does it cost to rent a motorcycle on the Costa del Sol?" },
+  bpx_subtitle: { fr: "Notre grille tarifaire expliquée simplement, sans frais cachés.",
+                  es: "Nuestra tabla de precios explicada de forma sencilla, sin costes ocultos.",
+                  en: "Our pricing explained simply, with no hidden fees." }
 };
