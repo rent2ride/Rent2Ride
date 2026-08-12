@@ -63,7 +63,6 @@ function sendTelegramNotification(text){
     body: JSON.stringify({ message: text }),
   }).catch(err => console.error("Erreur envoi notification:", err));
 }
-}
 
 /* Momoven listing URL — replace with your real listing once published. */
 const MOMOVEN_URL = "https://www.momoven.com";
@@ -862,9 +861,9 @@ const SHOP_IMAGES = {
 /* Photo affichée par défaut tant que la photo spécifique à la
    couleur (ci-dessus) n'existe pas encore sur le serveur. */
 const SHOP_IMAGE_FALLBACK = {
-  tshirt: "./images/shop-tshirt.jpg",
-  hoodie: "./images/shop-hoodie.jpg",
-  cap: "./images/shop-cap.jpg",
+  tshirt: "./images/shop-tshirt-black-front.jpg",
+  hoodie: "./images/shop-hoodie-black-front.jpg",
+  cap: "./images/shop-cap-black-front.jpg",
   stickers: "./images/shop-stickers.jpg",
 };
 
@@ -1560,6 +1559,6 @@ document.addEventListener("DOMContentLoaded", () => {
    ne le supporte pas. */
 if ("serviceWorker" in navigator){
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js").catch(() => {});
+    navigator.serviceWorker.register("./js/sw.js", { scope: "./" }).catch(() => {});
   });
 }
