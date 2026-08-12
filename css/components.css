@@ -265,8 +265,9 @@
 .bike-availability.is-available{
   background:var(--c-success);
 }
-.bike-availability.is-unavailable{
-  background:var(--c-accent);
+.bike-availability.is-unavailable {
+  background-color: #e0383a; /* Rouge Rent2Ride */
+  color: #ffffff;
 }
 
 /* ---- Carte grisée quand la moto est indisponible ---- */

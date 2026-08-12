@@ -1,4 +1,41 @@
 /* =========================================================
+   RENT2RIDE — MAIN APPLICATION SCRIPT
+   ========================================================= */
+
+// Configuration & Fallbacks de sécurité pour i18n
+let currentLang = localStorage.getItem('r2r_lang') || 'fr';
+
+function getTranslation(key, lang = currentLang) {
+    if (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[key]) {
+        return TRANSLATIONS[key][lang] || TRANSLATIONS[key]['fr'] || key;
+    }
+    return key;
+}
+
+function updatePageTranslations(lang = currentLang) {
+    currentLang = lang;
+    localStorage.setItem('r2r_lang', lang);
+    document.documentElement.lang = lang;
+
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        const translation = getTranslation(key, lang);
+        if (translation) {
+            if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                el.placeholder = translation;
+            } else {
+                el.textContent = translation;
+            }
+        }
+    });
+}
+
+// Initialisation au chargement du DOM
+document.addEventListener('DOMContentLoaded', () => {
+    updatePageTranslations(currentLang);
+});
+
+/* =========================================================
    RENT2RIDE — PREMIUM EDITION
    main.js
    ---------------------------------------------------------
