@@ -65,6 +65,24 @@ const PRICING = {
 };
 
 /* =========================================================
+   MODÈLES TEMPORAIREMENT INDISPONIBLES
+   ---------------------------------------------------------
+   Source de vérité UNIQUE pour "ce modèle n'est pas louable
+   pour l'instant", lue à la fois par catalogue.html (badges +
+   compteur) et reservation.html (menu déroulant), pour que les
+   deux pages restent toujours cohérentes entre elles. C'est
+   différent du système AVAILABILITY plus bas, qui ne bloque
+   que certaines dates déjà réservées.
+   Pour remettre un modèle en location : retirez-le simplement
+   de ce tableau.
+   ========================================================= */
+const PERMANENTLY_UNAVAILABLE = ["mt09", "tracer7", "tracer9"];
+
+function isModelPermanentlyUnavailable(model){
+  return PERMANENTLY_UNAVAILABLE.includes(model);
+}
+
+/* =========================================================
    CODES PROMO
    ---------------------------------------------------------
    Ajoutez/modifiez/supprimez librement des lignes ici. La clé
@@ -454,12 +472,30 @@ function initBookingForm(){
 
   const modelSelect = document.getElementById("bookingModel");
   if (modelSelect){
+    /* Grise et désactive dans le menu déroulant tout modèle listé dans
+       PERMANENTLY_UNAVAILABLE, avec la même logique que le catalogue,
+       pour que les deux pages ne se contredisent jamais. */
+    const lang = getCurrentLang();
+    Array.from(modelSelect.options).forEach(opt => {
+      if (isModelPermanentlyUnavailable(opt.value)){
+        opt.disabled = true;
+        opt.textContent = `${TRANSLATIONS[PRICING[opt.value].key][lang]} — ${TRANSLATIONS.status_unavailable[lang]}`;
+      }
+    });
+
+    // S'assure que la sélection par défaut (au chargement de la page,
+    // avant tout choix de l'utilisateur) tombe sur un modèle disponible.
+    const firstAvailable = Array.from(modelSelect.options).find(opt => !opt.disabled);
+    if (firstAvailable) modelSelect.value = firstAvailable.value;
+
     modelSelect.addEventListener("change", updateBookingSummary);
 
-    // Pre-select model if arriving from a "Book this bike" link (?model=mt09)
+    // Pre-select model if arriving from a "Book this bike" link (?model=mt09),
+    // mais seulement si ce modèle est bien disponible — sinon on ignore le
+    // lien et on garde la sélection par défaut ci-dessus.
     const params = new URLSearchParams(window.location.search);
     const requestedModel = params.get("model");
-    if (requestedModel && PRICING[requestedModel]){
+    if (requestedModel && PRICING[requestedModel] && !isModelPermanentlyUnavailable(requestedModel)){
       modelSelect.value = requestedModel;
     }
   }
@@ -468,6 +504,17 @@ function initBookingForm(){
     e.preventDefault();
     const success = document.getElementById("bookingSuccess");
     const warning = document.getElementById("bookingWarning");
+
+    // Garde-fou : un modèle indisponible ne devrait normalement pas être
+    // sélectionnable (options désactivées ci-dessus), mais on bloque quand
+    // même l'envoi ici au cas où.
+    if (modelSelect && isModelPermanentlyUnavailable(modelSelect.value)){
+      if (warning){
+        warning.textContent = TRANSLATIONS.status_unavailable[getCurrentLang()];
+        warning.classList.add("show");
+      }
+      return;
+    }
 
     if (!selectedRange.start || !selectedRange.end){
       if (warning){
@@ -665,27 +712,36 @@ function isModelBookedOn(model, date = new Date()){
   return getBookings().some(b => b.model === model && d >= b.start && d <= b.end);
 }
 
+/* Renvoie true si `model` est indisponible, que ce soit parce qu'il
+   est dans PERMANENTLY_UNAVAILABLE, ou réservé à la date donnée.
+   C'est LA fonction à utiliser partout pour tester la disponibilité
+   d'un modèle — catalogue, compteur, et formulaire de réservation. */
+function isModelUnavailable(model, date = new Date()){
+  return isModelPermanentlyUnavailable(model) || isModelBookedOn(model, date);
+}
+
 /* Met à jour l'affichage (badge + bouton) de toutes les cartes motos
-   présentes sur la page, selon les réservations enregistrées. */
+   présentes sur la page, selon les réservations enregistrées et la
+   liste PERMANENTLY_UNAVAILABLE. */
 function refreshAvailabilityBadges(){
   document.querySelectorAll(".bike-card[data-model]").forEach(card => {
     const model = card.dataset.model;
-    const booked = isModelBookedOn(model);
+    const unavailable = isModelUnavailable(model);
     const badge = card.querySelector(".bike-availability");
     const btn = card.querySelector(".bike-price-row .btn");
     const lang = getCurrentLang();
 
-    card.classList.toggle("unavailable", booked);
+    card.classList.toggle("unavailable", unavailable);
 
     if (badge){
-      badge.classList.toggle("is-available", !booked);
-      badge.classList.toggle("is-unavailable", booked);
-      badge.textContent = booked
+      badge.classList.toggle("is-available", !unavailable);
+      badge.classList.toggle("is-unavailable", unavailable);
+      badge.textContent = unavailable
         ? TRANSLATIONS.status_unavailable[lang]
         : TRANSLATIONS.status_available[lang];
     }
     if (btn){
-      btn.textContent = booked
+      btn.textContent = unavailable
         ? TRANSLATIONS.bike_unavailable_btn[lang]
         : TRANSLATIONS.bike_cta[lang];
     }
@@ -699,7 +755,7 @@ function updateAvailabilityCounter(){
   if (!el || !cards.length) return;
   const lang = getCurrentLang();
   let available = 0;
-  cards.forEach(card => { if (!isModelBookedOn(card.dataset.model)) available++; });
+  cards.forEach(card => { if (!isModelUnavailable(card.dataset.model)) available++; });
   el.classList.toggle("is-low", available <= 1);
   const template = TRANSLATIONS.availability_counter[lang];
   el.textContent = template.replace("{n}", available).replace("{total}", cards.length);
