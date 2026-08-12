@@ -1452,16 +1452,29 @@ body:has(#ridePlannerBar.is-visible){ padding-bottom:70px; }
 /* =========================================================
    COMPTEUR DE DISPONIBILITÉ EN DIRECT (page Catalogue)
    ========================================================= */
-.availability-counter{
-  display:inline-flex; align-items:center; gap:8px;
-  background:var(--c-success-soft); color:var(--c-success);
-  font-size:.84rem; font-weight:600;
-  padding:9px 16px; border-radius:var(--radius-pill);
-  margin-bottom:28px;
+.availability-counter {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--c-success-soft);
+  color: var(--c-success);
+  font-size: .88rem;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  margin-bottom: 24px;
+  border: 1px solid rgba(46, 125, 50, 0.15); /* Ajoute un contour léger pour détacher le bloc */
 }
-.availability-counter::before{ content:"●"; font-size:.6rem; }
-.availability-counter.is-low{ background:#FFF4E0; color:#B9750E; }
 
+.availability-counter::before { 
+  content: "●"; 
+  font-size: .6rem; 
+}
+
+.availability-counter.is-low { 
+  background: #FFF4E0; 
+  color: #B9750E; 
+}
 /* =========================================================
    MUR DE PHOTOS CLIENTS (page Galerie)
    ========================================================= */
