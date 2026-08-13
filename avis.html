@@ -200,8 +200,8 @@
     <!-- BARRE NEWSLETTER -->
     <div class="newsletter-bar">
       <div>
-        <h5>Prêt à prendre la route ?</h5>
-        <p>Réservez en ligne en 2 minutes, sans engagement.</p>
+        <h5 data-i18n="newsletter_t">Restez informé</h5>
+        <p data-i18n="newsletter_p">Bons plans, nouvelles routes, offres exclusives — pas de spam.</p>
       </div>
       <form class="newsletter-form">
         <input type="email" required placeholder="Votre e-mail" data-i18n-placeholder="newsletter_ph">
@@ -371,7 +371,7 @@
    Ils apparaissent immédiatement et persistent entre les visites.
    ========================================================= */
 
-const STORAGE_KEY = 'rent2ride_reviews';
+const REVIEWS_STORAGE_KEY = 'rent2ride_reviews';
 let selectedStars = 0;
 
 /* ---- Sélecteur d'étoiles ---- */
@@ -428,9 +428,9 @@ function submitReview(){
   const review = { stars: selectedStars, name, initials, text, model, month,
                    id: Date.now() };
 
-  const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  const stored = JSON.parse(localStorage.getItem(REVIEWS_STORAGE_KEY) || '[]');
   stored.unshift(review);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
+  localStorage.setItem(REVIEWS_STORAGE_KEY, JSON.stringify(stored));
 
   renderUserReviews();
   success.classList.add('show');
@@ -449,7 +449,7 @@ function submitReview(){
 function renderUserReviews(){
   const grid = document.getElementById('userReviewsGrid');
   if (!grid) return;
-  const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  const stored = JSON.parse(localStorage.getItem(REVIEWS_STORAGE_KEY) || '[]');
   if (!stored.length){ grid.innerHTML = ''; return; }
 
   grid.innerHTML = stored.map(r => `
@@ -475,8 +475,8 @@ function renderUserReviews(){
 }
 
 function deleteReview(id){
-  const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(stored.filter(r => r.id !== id)));
+  const stored = JSON.parse(localStorage.getItem(REVIEWS_STORAGE_KEY) || '[]');
+  localStorage.setItem(REVIEWS_STORAGE_KEY, JSON.stringify(stored.filter(r => r.id !== id)));
   renderUserReviews();
 }
 
