@@ -831,6 +831,8 @@ const TRANSLATIONS = {
   stock_in:   { fr: "En stock", es: "En stock", en: "In stock" },
   stock_low:  { fr: "Plus que {n} en stock", es: "Solo quedan {n}", en: "Only {n} left" },
   stock_out:  { fr: "Rupture de stock", es: "Agotado", en: "Out of stock" },
+  shop_closed:     { fr: "Pas disponible actuellement", es: "No disponible actualmente", en: "Not currently available" },
+  shop_closed_btn: { fr: "Bientôt disponible", es: "Próximamente disponible", en: "Coming soon" },
 
   /* Products */
   prod_tshirt_name: { fr: "T-shirt Rent2Ride", es: "Camiseta Rent2Ride", en: "Rent2Ride T-shirt" },

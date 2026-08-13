@@ -911,6 +911,17 @@ const SHOP_STOCK = {
 const STOCK_LOW_THRESHOLD = 3;
 
 /* =========================================================
+   BOUTIQUE OUVERTE / FERMÉE
+   ---------------------------------------------------------
+   Interrupteur global : tant que SHOP_OPEN vaut false, tous les
+   articles de la boutique s'affichent comme indisponibles et les
+   boutons "Ajouter au panier" sont désactivés — quel que soit le
+   stock réel indiqué dans SHOP_STOCK ci-dessus. Pour rouvrir la
+   boutique aux clients, repassez simplement SHOP_OPEN à true.
+   ========================================================= */
+const SHOP_OPEN = false;
+
+/* =========================================================
    CALCULATEUR DE PRIX (page Nos offres)
    ---------------------------------------------------------
    Reprend les mêmes paliers que les 6 formules affichées plus bas.
@@ -1315,6 +1326,18 @@ function updateStockDisplay(card){
   const badge = card.querySelector(".stock-badge");
   const addBtn = card.querySelector(".product-add");
   if (!badge || !addBtn) return;
+  const lang = getCurrentLang();
+
+  /* Boutique fermée : ceci prime sur tout le reste (y compris les
+     bons cadeaux, qui normalement n'ont pas de gestion de stock). */
+  if (!SHOP_OPEN){
+    badge.textContent = TRANSLATIONS.shop_closed[lang];
+    badge.classList.remove("stock-in", "stock-low");
+    badge.classList.add("stock-out");
+    addBtn.disabled = true;
+    addBtn.textContent = TRANSLATIONS.shop_closed_btn[lang];
+    return;
+  }
 
   /* Les bons cadeaux n'ont pas de stock physique -> pas de badge,
      toujours disponibles. Le prix affiché suit le montant choisi. */
@@ -1330,7 +1353,6 @@ function updateStockDisplay(card){
 
   const { size, color } = getSelectedVariant(card, productId);
   const remaining = getStockRemaining(productId, size, color);
-  const lang = getCurrentLang();
 
   badge.classList.remove("stock-in", "stock-low", "stock-out");
 
@@ -1366,6 +1388,8 @@ function initShopProductCards(){
     updateStockDisplay(card);
 
     addBtn.addEventListener("click", () => {
+      if (!SHOP_OPEN) return; // boutique fermée : sécurité en plus du bouton désactivé
+
       const { size, color } = getSelectedVariant(card, productId);
       if (productId !== "giftcard"){
         const remaining = getStockRemaining(productId, size, color);
