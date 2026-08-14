@@ -836,6 +836,18 @@ function clearAllBookings(){
    Le repère "STRIPE INTEGRATION POINT" ci-dessous marque l'endroit exact.
    ========================================================= */
 
+/* =========================================================
+   BONS CADEAUX — suivi de solde automatisé (Airtable + proxy)
+   ---------------------------------------------------------
+   Une fois le Cloudflare Worker déployé (voir /cloudflare-worker
+   dans le projet), collez ici son URL, par exemple :
+   window.GIFTCARD_API_BASE = "https://rent2ride-giftcards.VOTRE-SOUS-DOMAINE.workers.dev";
+   Tant que cette ligne reste vide/commentée, les bons cadeaux
+   continuent à fonctionner comme avant (commande simple envoyée
+   par WhatsApp/e-mail/Telegram), juste sans code ni suivi de solde.
+   ========================================================= */
+window.GIFTCARD_API_BASE = "https://rent2ride-giftcards.sch-eric-es.workers.dev"; // Worker Cloudflare configuré et testé le 14/08/2026
+
 const SHOP_PRODUCTS = {
   tshirt: {
     price: 24.90,
@@ -913,11 +925,14 @@ const STOCK_LOW_THRESHOLD = 3;
 /* =========================================================
    BOUTIQUE OUVERTE / FERMÉE
    ---------------------------------------------------------
-   Interrupteur global : tant que SHOP_OPEN vaut false, tous les
-   articles de la boutique s'affichent comme indisponibles et les
-   boutons "Ajouter au panier" sont désactivés — quel que soit le
-   stock réel indiqué dans SHOP_STOCK ci-dessus. Pour rouvrir la
-   boutique aux clients, repassez simplement SHOP_OPEN à true.
+   Interrupteur global : tant que SHOP_OPEN vaut false, les articles
+   physiques (t-shirt, sweat, casquette, stickers) s'affichent comme
+   indisponibles et leurs boutons "Ajouter au panier" sont désactivés
+   — quel que soit le stock réel indiqué dans SHOP_STOCK ci-dessus.
+   Le BON CADEAU fait exception : il reste toujours en vente, même
+   quand SHOP_OPEN est à false (voir updateStockDisplay plus bas).
+   Pour rouvrir toute la boutique aux clients, repassez simplement
+   SHOP_OPEN à true.
    ========================================================= */
 const SHOP_OPEN = false;
 
@@ -1216,13 +1231,41 @@ function buildOrderSummaryText(name, contact, address, note){
   return text;
 }
 
-function handleCheckoutSubmit(){
+async function createGiftCardsForCart(cart, name, email){
+  const giftItems = cart.filter(item => item.productId === "giftcard");
+  if (!giftItems.length || !window.GIFTCARD_API_BASE) return [];
+
+  const codes = [];
+  for (const item of giftItems){
+    // Un code distinct par unité (qty) — chaque bon cadeau a son propre solde.
+    for (let i = 0; i < item.qty; i++){
+      try {
+        const res = await fetch(`${window.GIFTCARD_API_BASE}/create`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ amount: Number(item.size), email, name }),
+        });
+        if (res.ok){
+          const data = await res.json();
+          codes.push({ amount: data.amount, code: data.code });
+        }
+      } catch (err){
+        // On n'empêche pas la commande de partir si la création du code échoue
+        // (ex. Worker non configuré/hors ligne) — juste pas de code inclus.
+      }
+    }
+  }
+  return codes;
+}
+
+async function handleCheckoutSubmit(){
   const nameEl = document.getElementById("checkoutName");
   const emailEl = document.getElementById("checkoutEmail");
   const phoneEl = document.getElementById("checkoutPhone");
   const addressEl = document.getElementById("checkoutAddress");
   const noteEl = document.getElementById("checkoutNote");
   const errorEl = document.getElementById("checkoutError");
+  const sendBtn = document.getElementById("checkoutSendBtn");
 
   const name = (nameEl?.value || "").trim();
   const email = (emailEl?.value || "").trim();
@@ -1237,7 +1280,22 @@ function handleCheckoutSubmit(){
   if (errorEl) errorEl.style.display = "none";
 
   const contact = [email, phone].filter(Boolean).join(" / ");
-  const summary = buildOrderSummaryText(name, contact, address, note);
+  const cart = getCart();
+
+  if (sendBtn) sendBtn.disabled = true;
+
+  // Si le panier contient un ou plusieurs bons cadeaux ET que le Worker
+  // est configuré (GIFTCARD_API_BASE), on génère leur(s) code(s) avant
+  // d'envoyer la commande, pour pouvoir les inclure dans le récapitulatif.
+  const giftCodes = await createGiftCardsForCart(cart, name, email);
+
+  let summary = buildOrderSummaryText(name, contact, address, note);
+  if (giftCodes.length){
+    const lines = giftCodes.map(g => `  • ${g.amount} € — code : ${g.code}`);
+    summary += `\n\nBon(s) cadeau généré(s) :\n${lines.join("\n")}`;
+  }
+
+  if (sendBtn) sendBtn.disabled = false;
 
   /* ============ STRIPE INTEGRATION POINT ============
      Ici, à terme, on remplacera le code WhatsApp/e-mail ci-dessous
@@ -1328,9 +1386,11 @@ function updateStockDisplay(card){
   if (!badge || !addBtn) return;
   const lang = getCurrentLang();
 
-  /* Boutique fermée : ceci prime sur tout le reste (y compris les
-     bons cadeaux, qui normalement n'ont pas de gestion de stock). */
-  if (!SHOP_OPEN){
+  /* Boutique fermée : ceci s'applique à tous les articles SAUF le bon
+     cadeau, qui reste en vente même quand le reste de la boutique est
+     fermé (voir GIFTCARD_ALWAYS_OPEN ci-dessous, avec SHOP_STOCK plus
+     haut). */
+  if (!SHOP_OPEN && productId !== "giftcard"){
     badge.textContent = TRANSLATIONS.shop_closed[lang];
     badge.classList.remove("stock-in", "stock-low");
     badge.classList.add("stock-out");
@@ -1388,7 +1448,7 @@ function initShopProductCards(){
     updateStockDisplay(card);
 
     addBtn.addEventListener("click", () => {
-      if (!SHOP_OPEN) return; // boutique fermée : sécurité en plus du bouton désactivé
+      if (!SHOP_OPEN && productId !== "giftcard") return; // boutique fermée : sécurité en plus du bouton désactivé (le bon cadeau reste en vente)
 
       const { size, color } = getSelectedVariant(card, productId);
       if (productId !== "giftcard"){

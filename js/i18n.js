@@ -834,6 +834,31 @@ const TRANSLATIONS = {
   shop_closed:     { fr: "Pas disponible actuellement", es: "No disponible actualmente", en: "Not currently available" },
   shop_closed_btn: { fr: "Bientôt disponible", es: "Próximamente disponible", en: "Coming soon" },
 
+  /* ---------------- BOUTIQUE — lien vers la vérification de solde ---------------- */
+  giftcard_check_balance_link: { fr: "Vous avez déjà un bon cadeau ? Vérifier le solde →",
+                                  es: "¿Ya tienes un vale regalo? Comprobar el saldo →",
+                                  en: "Already have a gift card? Check your balance →" },
+
+  /* ---------------- PAGE solde-cadeau.html ---------------- */
+  title_giftbalance:   { fr: "Solde de mon bon cadeau — Rent2Ride", es: "Saldo de mi vale regalo — Rent2Ride", en: "My gift card balance — Rent2Ride" },
+  giftbalance_title:   { fr: "Le solde de votre bon cadeau", es: "El saldo de tu vale regalo", en: "Your gift card balance" },
+  giftbalance_sub:     { fr: "Entrez le code reçu par e-mail au moment de l'achat pour voir ce qu'il vous reste.",
+                          es: "Introduce el código recibido por correo electrónico al comprar para ver lo que te queda.",
+                          en: "Enter the code you received by email at purchase to see what's left." },
+  giftbalance_code_label: { fr: "Code du bon cadeau", es: "Código del vale regalo", en: "Gift card code" },
+  giftbalance_check_btn:  { fr: "Vérifier le solde", es: "Comprobar el saldo", en: "Check balance" },
+  giftbalance_help:    { fr: "Le code vous a été envoyé par e-mail à l'achat. Vous ne le retrouvez pas ? Contactez-nous directement, nous pouvons le retrouver avec votre adresse e-mail.",
+                          es: "El código te fue enviado por correo electrónico al comprar. ¿No lo encuentras? Contáctanos directamente, podemos localizarlo con tu dirección de correo.",
+                          en: "The code was emailed to you at purchase. Can't find it? Contact us directly, we can look it up using your email address." },
+  giftbalance_remaining:  { fr: "Il vous reste", es: "Te queda", en: "You have left" },
+  giftbalance_of_initial: { fr: "sur un bon cadeau initial de {n} €", es: "de un vale regalo inicial de {n} €", en: "of an original {n} € gift card" },
+  giftbalance_not_found:  { fr: "Ce code n'existe pas. Vérifiez qu'il est bien saisi tel que reçu par e-mail.",
+                             es: "Este código no existe. Comprueba que lo has introducido tal como lo recibiste por correo.",
+                             en: "This code doesn't exist. Please check it matches exactly what you received by email." },
+  giftbalance_error:      { fr: "Une erreur est survenue. Réessayez dans un instant ou contactez-nous.",
+                             es: "Se produjo un error. Inténtalo de nuevo en un momento o contáctanos.",
+                             en: "Something went wrong. Please try again shortly or contact us." },
+
   /* Products */
   prod_tshirt_name: { fr: "T-shirt Rent2Ride", es: "Camiseta Rent2Ride", en: "Rent2Ride T-shirt" },
   prod_tshirt_desc: { fr: "Coton bio 180g, logo brodé Rent2Ride sur la poitrine.",
