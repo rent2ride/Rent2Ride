@@ -1549,11 +1549,14 @@ body:has(#ridePlannerBar.is-visible){ padding-bottom:70px; }
 .field-row .field{ flex:1; }
 .field-note{ font-size:.78rem; color:var(--c-ink-faint); line-height:1.5; margin:-6px 0 16px; }
 
-/* Fixe l'alignement vertical de la barre de navigation */
-.site-header .nav-links,
-nav .nav-links {
-  display: flex !important;
-  align-items: center !important;
+/* Fixe l'alignement vertical de la barre de navigation (desktop uniquement,
+   pour ne pas écraser le toggle .open du menu mobile géré par le JS) */
+@media (min-width: 901px) {
+  .site-header .nav-links,
+  nav .nav-links {
+    display: flex !important;
+    align-items: center !important;
+  }
 }
 
 /* Force tous les liens du menu à rester sur une seule ligne */
