@@ -1490,6 +1490,17 @@ function initVideoParallax(){
   const video = document.querySelector(".hero-video-bg");
   const section = document.querySelector(".hero-video-section");
   if (!video || !section) return;
+
+  // Filet de sécurité : tant qu'aucun fichier hero-video.mp4 n'existe
+  // (ou en cas d'erreur de chargement), on masque la balise <video> —
+  // le carrousel de photos existant reste visible à la place, exactement
+  // comme avant l'ajout de la vidéo. Dès que le fichier est présent et
+  // se charge correctement, la vidéo prend automatiquement le relais.
+  video.addEventListener("error", () => { video.style.display = "none"; }, true);
+  if (video.readyState === 0 && video.networkState === 3){
+    video.style.display = "none";
+  }
+
   if (window.matchMedia("(max-width: 900px)").matches) return; // désactivé sur mobile
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 

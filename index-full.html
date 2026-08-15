@@ -88,8 +88,15 @@
      Format recommandé : MP4 (H.264), 1920x1080, durée 15-60s
      La vidéo tourne en boucle, sans son, automatiquement.
      Si la vidéo ne charge pas, la photo hero.jpg s'affiche à la place. -->
-<section class="hero" id="heroCarousel">
-  <!-- Carrousel de photos en fondu automatique -->
+<section class="hero hero-video-section" id="heroCarousel">
+  <!-- Vidéo de fond : nommez votre fichier exactement "hero-video.mp4"
+       et déposez-le dans le dossier images/ du site.
+       Si le fichier est absent ou ne charge pas, la photo hero.jpg
+       (poster) s'affiche à la place automatiquement. -->
+  <video class="hero-video-bg" autoplay muted loop playsinline poster="./images/hero.jpg">
+    <source src="./images/hero-video.mp4" type="video/mp4">
+  </video>
+  <!-- Carrousel de photos en fondu automatique (repli si la vidéo est absente) -->
   <div class="hero-carousel">
     <div class="hero-slide is-active" style="background-image:url('./images/index-1.jpg')"></div>
     <div class="hero-slide" style="background-image:url('./images/index-2.jpg')"></div>
