@@ -24,6 +24,48 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/base.css">
 <link rel="stylesheet" href="./css/components.css?v=2">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<style>
+  #ridesMapSection{padding:0 0 12px;}
+  #ridesMap{
+    width:100%;
+    height:440px;
+    border-radius:16px;
+    overflow:hidden;
+    box-shadow:0 8px 30px rgba(0,0,0,.12);
+    margin-bottom:18px;
+  }
+  .rides-map-legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:16px;
+    align-items:center;
+    margin-bottom:22px;
+    font-size:.85rem;
+    color:var(--text-secondary,#555);
+  }
+  .rides-map-legend span{display:inline-flex;align-items:center;gap:6px;}
+  .rides-map-legend i{width:16px;height:4px;border-radius:2px;display:inline-block;}
+  .leaflet-popup-content{font-family:var(--f-body,inherit);}
+  .leaflet-popup-content b{display:block;margin-bottom:4px;font-family:var(--f-display,inherit);}
+  .leaflet-popup-content a{color:#E0383A;font-weight:600;text-decoration:none;}
+  .ride-card.ride-highlight{
+    outline:3px solid #E0383A;
+    outline-offset:4px;
+    transition:outline-color .3s ease;
+    scroll-margin-top:100px;
+  }
+  .ride-locate-btn{
+    background:none;
+    border:1px solid currentColor;
+    border-radius:20px;
+    font-size:.75rem;
+    padding:5px 12px;
+    cursor:pointer;
+    opacity:.75;
+  }
+  .ride-locate-btn:hover{opacity:1;}
+</style>
 </head>
 <body>
 
@@ -84,6 +126,17 @@
       <button onclick="filterRides('hard', this)" data-i18n="diff_hard">Sportif</button>
     </div>
 
+    <!-- ================= CARTE INTERACTIVE ================= -->
+    <div id="ridesMapSection">
+      <div id="ridesMap"></div>
+      <div class="rides-map-legend">
+        <span><i style="background:#3fa34d"></i> <span data-i18n="diff_easy">Facile</span></span>
+        <span><i style="background:#d98c2b"></i> <span data-i18n="diff_medium">Modéré</span></span>
+        <span><i style="background:#E0383A"></i> <span data-i18n="diff_hard">Sportif</span></span>
+        <span style="margin-left:auto; opacity:.7;" data-i18n="map_hint">Cliquez un tracé pour voir le détail de la balade</span>
+      </div>
+    </div>
+
     <div class="rides-list">
 
       <!-- ===== RIDE 1 — Ronda ===== -->
@@ -117,6 +170,7 @@
           <div class="ride-gps">
             <a href="./gpx/balade-01-col-de-la-ronda.gpx" download class="btn btn-outline btn-sm"><span data-i18n="label_gpx">Télécharger le GPX</span></a>
             <a href="https://www.google.com/maps/dir/?api=1&origin=36.4848,-4.9970&destination=36.7213,-5.1636&waypoints=36.5721,-5.0398|36.6520,-5.0870&travelmode=driving" target="_blank" rel="noopener" class="btn btn-outline btn-sm"><span data-i18n="label_map">Voir l'itinéraire</span></a>
+            <button type="button" class="btn btn-outline btn-sm ride-locate-btn" onclick="locateRideOnMap(1)"><span data-i18n="label_locate">Localiser sur la carte</span></button>
           </div>
           <label class="ride-plan-check">
             <input type="checkbox" class="ride-plan-input" data-ride-id="1">
@@ -160,6 +214,7 @@
           <div class="ride-gps">
             <a href="./gpx/balade-02-corniche-costa-del-sol.gpx" download class="btn btn-outline btn-sm"><span data-i18n="label_gpx">Télécharger le GPX</span></a>
             <a href="https://www.google.com/maps/dir/?api=1&origin=36.7213,-4.4214&destination=36.4285,-5.1449&waypoints=36.5988,-4.5054|36.5411,-4.6247|36.5100,-4.8826&travelmode=driving" target="_blank" rel="noopener" class="btn btn-outline btn-sm"><span data-i18n="label_map">Voir l'itinéraire</span></a>
+            <button type="button" class="btn btn-outline btn-sm ride-locate-btn" onclick="locateRideOnMap(2)"><span data-i18n="label_locate">Localiser sur la carte</span></button>
           </div>
           <label class="ride-plan-check">
             <input type="checkbox" class="ride-plan-input" data-ride-id="2">
@@ -203,6 +258,7 @@
           <div class="ride-gps">
             <a href="./gpx/balade-03-circuit-villages-blancs.gpx" download class="btn btn-outline btn-sm"><span data-i18n="label_gpx">Télécharger le GPX</span></a>
             <a href="https://www.google.com/maps/dir/?api=1&origin=36.5959,-4.6372&destination=36.5959,-4.6372&waypoints=36.5537,-4.8523|36.5892,-4.8511|36.6598,-4.7565|36.6002,-4.7469&travelmode=driving" target="_blank" rel="noopener" class="btn btn-outline btn-sm"><span data-i18n="label_map">Voir l'itinéraire</span></a>
+            <button type="button" class="btn btn-outline btn-sm ride-locate-btn" onclick="locateRideOnMap(3)"><span data-i18n="label_locate">Localiser sur la carte</span></button>
           </div>
           <label class="ride-plan-check">
             <input type="checkbox" class="ride-plan-input" data-ride-id="3">
@@ -246,6 +302,7 @@
           <div class="ride-gps">
             <a href="./gpx/balade-04-sierra-nevada-veleta.gpx" download class="btn btn-outline btn-sm"><span data-i18n="label_gpx">Télécharger le GPX</span></a>
             <a href="https://www.google.com/maps/dir/?api=1&origin=37.1773,-3.5986&destination=37.0542,-3.3661&waypoints=37.1000,-3.4700|37.0967,-3.3961&travelmode=driving" target="_blank" rel="noopener" class="btn btn-outline btn-sm"><span data-i18n="label_map">Voir l'itinéraire</span></a>
+            <button type="button" class="btn btn-outline btn-sm ride-locate-btn" onclick="locateRideOnMap(4)"><span data-i18n="label_locate">Localiser sur la carte</span></button>
           </div>
           <label class="ride-plan-check">
             <input type="checkbox" class="ride-plan-input" data-ride-id="4">
@@ -289,6 +346,7 @@
           <div class="ride-gps">
             <a href="./gpx/balade-05-cabo-de-gata.gpx" download class="btn btn-outline btn-sm"><span data-i18n="label_gpx">Télécharger le GPX</span></a>
             <a href="https://www.google.com/maps/dir/?api=1&origin=36.8381,-2.4597&destination=36.8381,-2.4597&waypoints=36.7677,-2.1058|36.7743,-2.0396|36.8848,-2.0563&travelmode=driving" target="_blank" rel="noopener" class="btn btn-outline btn-sm"><span data-i18n="label_map">Voir l'itinéraire</span></a>
+            <button type="button" class="btn btn-outline btn-sm ride-locate-btn" onclick="locateRideOnMap(5)"><span data-i18n="label_locate">Localiser sur la carte</span></button>
           </div>
           <label class="ride-plan-check">
             <input type="checkbox" class="ride-plan-input" data-ride-id="5">
@@ -332,6 +390,7 @@
           <div class="ride-gps">
             <a href="./gpx/balade-06-alpujarras.gpx" download class="btn btn-outline btn-sm"><span data-i18n="label_gpx">Télécharger le GPX</span></a>
             <a href="https://www.google.com/maps/dir/?api=1&origin=36.9214,-3.4842&destination=36.9598,-3.2664&waypoints=36.8998,-3.4198|36.8994,-3.3496|36.9161,-3.3479&travelmode=driving" target="_blank" rel="noopener" class="btn btn-outline btn-sm"><span data-i18n="label_map">Voir l'itinéraire</span></a>
+            <button type="button" class="btn btn-outline btn-sm ride-locate-btn" onclick="locateRideOnMap(6)"><span data-i18n="label_locate">Localiser sur la carte</span></button>
           </div>
           <label class="ride-plan-check">
             <input type="checkbox" class="ride-plan-input" data-ride-id="6">
@@ -375,6 +434,7 @@
           <div class="ride-gps">
             <a href="./gpx/balade-07-parc-de-grazalema.gpx" download class="btn btn-outline btn-sm"><span data-i18n="label_gpx">Télécharger le GPX</span></a>
             <a href="https://www.google.com/maps/dir/?api=1&origin=36.7213,-5.1636&destination=36.7580,-5.3646&waypoints=36.7440,-5.2360|36.7311,-5.2593&travelmode=driving" target="_blank" rel="noopener" class="btn btn-outline btn-sm"><span data-i18n="label_map">Voir l'itinéraire</span></a>
+            <button type="button" class="btn btn-outline btn-sm ride-locate-btn" onclick="locateRideOnMap(7)"><span data-i18n="label_locate">Localiser sur la carte</span></button>
           </div>
           <label class="ride-plan-check">
             <input type="checkbox" class="ride-plan-input" data-ride-id="7">
@@ -587,6 +647,7 @@
 <script src="./js/i18n.js"></script>
 <script src="./js/cookie-consent.js"></script>
 <script src="./js/main.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
 /* ---- Filter rides by difficulty ---- */
 function filterRides(diff, btn){
@@ -595,6 +656,78 @@ function filterRides(diff, btn){
   document.querySelectorAll('.ride-card').forEach(card => {
     card.style.display = (diff === 'all' || card.dataset.diff === diff) ? '' : 'none';
   });
+  if (window._ridesMapLines){
+    Object.entries(window._ridesMapLines).forEach(([id, line]) => {
+      const card = document.querySelector('.ride-card[data-ride-id="'+id+'"]');
+      const show = diff === 'all' || (card && card.dataset.diff === diff);
+      const el = line.getElement && line.getElement();
+      if (el) el.style.display = show ? '' : 'none';
+    });
+  }
+}
+
+/* ---- Interactive rides map (Leaflet) ---- */
+const RIDES_GEO = [
+  { id: 1, name: "Col de la Ronda",              diff: "medium", coords: [[36.4848,-4.9970],[36.5721,-5.0398],[36.6520,-5.0870],[36.7213,-5.1636]] },
+  { id: 2, name: "Corniche de la Costa del Sol",  diff: "easy",   coords: [[36.7213,-4.4214],[36.5988,-4.5054],[36.5411,-4.6247],[36.5100,-4.8826],[36.4285,-5.1449]] },
+  { id: 3, name: "Circuit des villages blancs",   diff: "medium", coords: [[36.5959,-4.6372],[36.5537,-4.8523],[36.5892,-4.8511],[36.6598,-4.7565],[36.6002,-4.7469],[36.5959,-4.6372]] },
+  { id: 4, name: "Sierra Nevada — Veleta",        diff: "hard",   coords: [[37.1773,-3.5986],[37.1000,-3.4700],[37.0967,-3.3961],[37.0542,-3.3661]] },
+  { id: 5, name: "Cabo de Gata",                  diff: "medium", coords: [[36.8381,-2.4597],[36.7677,-2.1058],[36.7743,-2.0396],[36.8848,-2.0563],[36.8381,-2.4597]] },
+  { id: 6, name: "Les Alpujarras",                diff: "hard",   coords: [[36.9214,-3.4842],[36.8998,-3.4198],[36.8994,-3.3496],[36.9161,-3.3479],[36.9598,-3.2664]] },
+  { id: 7, name: "Parc de Grazalema",             diff: "hard",   coords: [[36.7213,-5.1636],[36.7440,-5.2360],[36.7311,-5.2593],[36.7580,-5.3646]] }
+];
+const DIFF_COLORS = { easy: "#3fa34d", medium: "#d98c2b", hard: "#E0383A" };
+
+document.addEventListener('DOMContentLoaded', function(){
+  if (!document.getElementById('ridesMap') || typeof L === 'undefined') return;
+
+  const map = L.map('ridesMap', { scrollWheelZoom: false });
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors',
+    maxZoom: 18
+  }).addTo(map);
+
+  const bounds = [];
+  window._ridesMapLines = {};
+
+  RIDES_GEO.forEach(ride => {
+    const color = DIFF_COLORS[ride.diff] || "#E0383A";
+    const line = L.polyline(ride.coords, { color, weight: 4, opacity: 0.85 }).addTo(map);
+    window._ridesMapLines[ride.id] = line;
+    ride.coords.forEach(c => bounds.push(c));
+
+    L.circleMarker(ride.coords[0], { radius: 5, color, fillColor: color, fillOpacity: 1 }).addTo(map);
+
+    line.bindPopup('<b>' + ride.name + '</b><a href="#" onclick="scrollToRide(' + ride.id + ');return false;">Voir la fiche &rarr;</a>');
+    line.on('mouseover', () => line.setStyle({ weight: 7 }));
+    line.on('mouseout',  () => line.setStyle({ weight: 4 }));
+    line.on('click', () => scrollToRide(ride.id));
+  });
+
+  if (bounds.length) map.fitBounds(bounds, { padding: [24, 24] });
+
+  window._ridesMap = map;
+});
+
+function scrollToRide(id){
+  const card = document.querySelector('.ride-card[data-ride-id="' + id + '"]');
+  if (!card) return;
+  card.style.display = '';
+  document.querySelectorAll('.rides-filter button').forEach(b => b.classList.remove('active'));
+  document.querySelector('.rides-filter button')?.classList.add('active'); // reset to "Tous"
+  document.querySelectorAll('.ride-card').forEach(c => c.style.display = '');
+  card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  card.classList.add('ride-highlight');
+  setTimeout(() => card.classList.remove('ride-highlight'), 2200);
+}
+
+function locateRideOnMap(id){
+  const map = window._ridesMap;
+  const line = window._ridesMapLines && window._ridesMapLines[id];
+  if (!map || !line) return;
+  document.getElementById('ridesMapSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  map.fitBounds(line.getBounds(), { padding: [40, 40], maxZoom: 12 });
+  setTimeout(() => line.openPopup(line.getBounds().getCenter()), 400);
 }
 </script>
 </body>
