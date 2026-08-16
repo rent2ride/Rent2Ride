@@ -192,6 +192,42 @@
         <input type="hidden" id="pickupDate" name="pickup_date">
         <input type="hidden" id="returnDate" name="return_date">
 
+        <!-- ============================================================
+             MODE DE RÉCUPÉRATION — Retrait agence vs Livraison
+             Statut : STRUCTURE PRÊTE, TARIFS ET RÈGLES NON DÉFINIS.
+             À confirmer avant activation réelle :
+               - Zone de livraison couverte (Barcelone ville ? Costa del
+                 Sol entière ? rayon en km ?)
+               - Tarif du supplément livraison (fixe ou au km)
+               - Couverture assurance pendant le trajet de livraison
+                 (le convoyeur / la moto en trajet est-il couvert par
+                 la même police que la location classique ?)
+               - Montant/modalités de l'acompte OU de l'empreinte
+                 bancaire pour le retrait en agence (à trancher : l'un
+                 ou l'autre, ou les deux selon le cas)
+             Tant que ces points ne sont pas tranchés, aucun montant
+             réel n'est affiché ni facturé — uniquement "à confirmer".
+             ============================================================ -->
+        <div class="field">
+          <label data-i18n="form_delivery_mode">Comment récupérez-vous la moto ?</label>
+          <div class="delivery-mode-toggle" role="radiogroup">
+            <label class="delivery-mode-option">
+              <input type="radio" name="delivery_mode" value="pickup" id="modePickup" checked>
+              <span data-i18n="form_mode_pickup">Retrait à l'agence</span>
+            </label>
+            <label class="delivery-mode-option">
+              <input type="radio" name="delivery_mode" value="delivery" id="modeDelivery">
+              <span data-i18n="form_mode_delivery">Livraison à mon adresse (supplément)</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="field" id="deliveryAddressField" style="display:none;">
+          <label for="deliveryAddress" data-i18n="form_delivery_address">Adresse de livraison</label>
+          <input type="text" id="deliveryAddress" name="delivery_address" placeholder="Rue, ville, code postal">
+          <p class="field-note" data-i18n="form_delivery_note">Le supplément de livraison dépend de la distance — tarif à confirmer avant réservation définitive.</p>
+        </div>
+
         <div class="field">
           <label for="fullName" data-i18n="form_name">Nom complet</label>
           <input type="text" id="fullName" name="full_name" required>
@@ -219,13 +255,14 @@
           <div class="summary-row"><span data-i18n="summary_rate">Tarif journalier</span><span id="summaryRate">—</span></div>
           <div class="summary-row" id="summaryDiscountRow" style="display:none;"><span data-i18n="summary_discount">Réduction</span><span id="summaryDiscount">—</span></div>
           <div class="summary-row" id="summaryHoursFeeRow" style="display:none;"><span data-i18n="summary_hours_fee">Supplément hors horaires</span><span id="summaryHoursFee">—</span></div>
+          <div class="summary-row" id="summaryDeliveryFeeRow" style="display:none;"><span data-i18n="summary_delivery_fee">Supplément livraison</span><span id="summaryDeliveryFee" data-i18n="price_tbd">à confirmer</span></div>
           <div class="summary-row total"><span data-i18n="summary_total">Total estimé</span><span id="summaryTotal">—</span></div>
         </div>
 
         <div class="form-warning" id="bookingWarning"></div>
 
         <button type="submit" class="btn btn-primary btn-block" data-i18n="form_submit">Demander la réservation</button>
-        <p class="form-note" data-i18n="form_note">Aucun paiement n'est requis maintenant.</p>
+        <p class="form-note" id="paymentModeNote" data-i18n="form_note">Aucun paiement n'est requis maintenant. Nous confirmons la disponibilité par e-mail sous 24h.</p>
         <div class="form-success" id="bookingSuccess" data-i18n="form_success">Merci !</div>
         <button type="button" class="btn btn-outline btn-sm" id="printConfirmBtn" style="display:none; margin-top:12px;" data-i18n="print_confirm">🖨️ Imprimer / Enregistrer en PDF</button>
       </form>
@@ -407,9 +444,38 @@
 
 <script src="./js/stripe-config.js"></script>
 <script>
+  // Bascule Retrait / Livraison — n'affecte que l'affichage.
+  // Le calcul du prix (jours, tarif, total) reste géré par main.js,
+  // non modifié ici pour éviter de casser la logique existante.
+  document.addEventListener('DOMContentLoaded', function(){
+    var radios = document.querySelectorAll('input[name="delivery_mode"]');
+    var addressField = document.getElementById('deliveryAddressField');
+    var addressInput = document.getElementById('deliveryAddress');
+    var deliveryFeeRow = document.getElementById('summaryDeliveryFeeRow');
+    var paymentNote = document.getElementById('paymentModeNote');
+    if (!radios.length) return;
+
+    var NOTE_PICKUP = "Aucun paiement en ligne requis pour l'instant. Un acompte ou une empreinte bancaire pourra être demandé à la confirmation (modalités à définir).";
+    var NOTE_DELIVERY = "Pour une livraison, le règlement intégral en ligne sera nécessaire pour confirmer (paiement en ligne à venir — voir stripe-config.js).";
+
+    function updateMode(){
+      var mode = document.querySelector('input[name="delivery_mode"]:checked').value;
+      var isDelivery = (mode === 'delivery');
+      addressField.style.display = isDelivery ? '' : 'none';
+      addressInput.required = isDelivery;
+      deliveryFeeRow.style.display = isDelivery ? '' : 'none';
+      if (paymentNote) paymentNote.textContent = isDelivery ? NOTE_DELIVERY : NOTE_PICKUP;
+    }
+
+    radios.forEach(function(r){ r.addEventListener('change', updateMode); });
+    updateMode();
+  });
+</script>
+<script>
   // Une fois Stripe correctement configuré (voir stripe-config.js),
-  // ce même bouton passe automatiquement en mode paiement en ligne.
-  // Tant que ce n'est pas le cas, rien ne change : comportement normal.
+  // le bouton du panier (gift cards / boutique) passe automatiquement
+  // en mode paiement en ligne. Tant que ce n'est pas le cas, rien ne
+  // change : comportement normal.
   document.addEventListener('DOMContentLoaded', function(){
     var cfg = window.STRIPE_CONFIG || {};
     var btn = document.getElementById('checkoutSendBtn');
