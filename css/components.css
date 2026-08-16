@@ -4,8 +4,6 @@
    reviews, FAQ, gallery, WhatsApp widget, footer
    ========================================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
-
 /* =========================================================
    SECTION HEADERS / LAYOUT
    ========================================================= */
@@ -688,7 +686,7 @@ table.price-table tbody tr:hover{ background:var(--c-bg-cream); }
 @media (max-width:900px){
   .page-hero{ background-attachment:scroll; }
 }
-.page-hero h1{ font-family:'Permanent Marker', var(--f-display); text-transform:uppercase; letter-spacing:.01em; font-size:clamp(2rem,4.4vw,3rem); margin:0 0 10px; font-weight:400; text-shadow:0 2px 14px rgba(0,0,0,.35); }
+.page-hero h1{ font-family:Arial, Helvetica, sans-serif; letter-spacing:.01em; font-size:clamp(2rem,4.4vw,3rem); margin:0 0 10px; font-weight:700; text-shadow:0 2px 14px rgba(0,0,0,.35); }
 .page-hero p{ max-width:560px; color:rgba(255,255,255,.92); font-size:1.02rem; line-height:1.6; margin:0; text-shadow:0 1px 8px rgba(0,0,0,.35); }
 
 /* =========================================================
