@@ -382,12 +382,52 @@
     </div>
     <div class="checkout-actions">
       <button class="checkout-back" id="checkoutBackBtn" data-i18n="checkout_back_cart">Retour au panier</button>
+
+      <!-- ============================================================
+           PAIEMENT EN LIGNE (STRIPE) — EN ATTENTE D'ACTIVATION
+           Ne pas activer tant que :
+             1) La société (S.L.) n'est pas immatriculée
+             2) Le compte Stripe Business n'est pas ouvert et vérifié
+             3) La clé secrète Stripe est en place côté Cloudflare Worker
+                (jamais côté client — voir js/stripe-config.js)
+           Pour activer : mettre STRIPE_ENABLED = true dans
+           js/stripe-config.js et déployer l'endpoint Worker
+           /create-checkout-session (voir commentaire dans ce fichier).
+           ============================================================ -->
+      <button
+        class="btn btn-primary btn-block"
+        id="checkoutPayBtn"
+        disabled
+        title="Paiement en ligne — bientôt disponible"
+        style="opacity:.5; cursor:not-allowed;"
+        data-i18n="checkout_pay_card">
+        💳 Payer par carte (bientôt disponible)
+      </button>
+
       <button class="btn btn-primary btn-block" id="checkoutSendBtn" data-i18n="checkout_send_both">Envoyer ma commande</button>
     </div>
   </div>
 
 </aside>
 
+<script src="./js/stripe-config.js"></script>
+<script>
+  // Sécurité : le bouton "Payer par carte" ne se réactive
+  // QUE si les 3 conditions sont réunies (activé + clé + endpoint).
+  // Sinon il reste désactivé, même par erreur.
+  document.addEventListener('DOMContentLoaded', function(){
+    var cfg = window.STRIPE_CONFIG || {};
+    var btn = document.getElementById('checkoutPayBtn');
+    if (!btn) return;
+    var ready = cfg.STRIPE_ENABLED && cfg.STRIPE_PUBLISHABLE_KEY && cfg.STRIPE_CHECKOUT_ENDPOINT;
+    if (ready) {
+      btn.disabled = false;
+      btn.style.opacity = '';
+      btn.style.cursor = '';
+      btn.title = '';
+    }
+  });
+</script>
 <script src="./js/i18n.js"></script>
 <script src="./js/cookie-consent.js"></script>
 <script src="./js/main.js"></script>
