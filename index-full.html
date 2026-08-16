@@ -119,6 +119,23 @@
   </div>
   <!-- Overlay sombre pour lisibilité du texte -->
   <div class="hero-video-overlay"></div>
+  <script>
+    (function(){
+      var section = document.getElementById('heroCarousel');
+      var video = section.querySelector('.hero-video-bg');
+      var carousel = section.querySelector('.hero-carousel');
+      if (!video || !carousel) return;
+      carousel.style.display = 'none';
+      function showCarouselFallback(){ carousel.style.display = ''; }
+      video.addEventListener('error', showCarouselFallback);
+      video.addEventListener('stalled', showCarouselFallback);
+      if (video.readyState === 0) {
+        setTimeout(function(){
+          if (video.readyState === 0) showCarouselFallback();
+        }, 4000);
+      }
+    })();
+  </script>
   <!-- Contenu texte -->
   <div class="hero-content">
     <span class="hero-badge-pill" data-i18n="hero_pill">★ 4.9/5 · 1,200+ rentals</span>
