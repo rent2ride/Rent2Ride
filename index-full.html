@@ -21,19 +21,27 @@
 <link rel="icon" type="image/png" href="./favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=Permanent+Marker&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/base.css">
 <link rel="stylesheet" href="./css/components.css?v=2">
 <style>
+  @font-face{
+    font-family:'Webrush';
+    src:url('./fonts/Webrush-Demo.ttf') format('truetype');
+    font-weight:normal;
+    font-style:normal;
+    font-display:swap;
+  }
   .hero-content h1{
-    font-family:'Permanent Marker', var(--f-display), cursive;
+    font-family:'Webrush', var(--f-display), cursive;
     font-weight:400;
-    letter-spacing:.01em;
-    line-height:1.15;
+    letter-spacing:.02em;
+    line-height:1.2;
+    text-transform:uppercase;
     text-shadow:0 3px 18px rgba(0,0,0,.45);
   }
   @media (max-width:600px){
-    .hero-content h1{ font-size:clamp(1.9rem,9vw,2.6rem); }
+    .hero-content h1{ font-size:clamp(1.9rem,9vw,2.4rem); }
   }
 </style>
 <script type="application/ld+json">
