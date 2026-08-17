@@ -209,23 +209,23 @@
              réel n'est affiché ni facturé — uniquement "à confirmer".
              ============================================================ -->
         <div class="field">
-          <label data-i18n="form_delivery_mode">Comment récupérez-vous la moto ?</label>
+          <label>Comment récupérez-vous la moto ?</label>
           <div class="delivery-mode-toggle" role="radiogroup">
             <label class="delivery-mode-option">
               <input type="radio" name="delivery_mode" value="pickup" id="modePickup" checked>
-              <span data-i18n="form_mode_pickup">Retrait à l'agence</span>
+              <span>Retrait à l'agence</span>
             </label>
             <label class="delivery-mode-option">
               <input type="radio" name="delivery_mode" value="delivery" id="modeDelivery">
-              <span data-i18n="form_mode_delivery">Livraison à mon adresse (supplément)</span>
+              <span>Livraison à mon adresse (supplément)</span>
             </label>
           </div>
         </div>
 
         <div class="field" id="deliveryAddressField" style="display:none;">
-          <label for="deliveryAddress" data-i18n="form_delivery_address">Adresse de livraison</label>
+          <label for="deliveryAddress">Adresse de livraison</label>
           <input type="text" id="deliveryAddress" name="delivery_address" placeholder="Rue, ville, code postal">
-          <p class="field-note" data-i18n="form_delivery_note">Le supplément de livraison dépend de la distance — tarif à confirmer avant réservation définitive.</p>
+          <p class="field-note">Le supplément de livraison dépend de la distance — tarif à confirmer avant réservation définitive.</p>
         </div>
 
         <div class="field">
@@ -255,7 +255,7 @@
           <div class="summary-row"><span data-i18n="summary_rate">Tarif journalier</span><span id="summaryRate">—</span></div>
           <div class="summary-row" id="summaryDiscountRow" style="display:none;"><span data-i18n="summary_discount">Réduction</span><span id="summaryDiscount">—</span></div>
           <div class="summary-row" id="summaryHoursFeeRow" style="display:none;"><span data-i18n="summary_hours_fee">Supplément hors horaires</span><span id="summaryHoursFee">—</span></div>
-          <div class="summary-row" id="summaryDeliveryFeeRow" style="display:none;"><span data-i18n="summary_delivery_fee">Supplément livraison</span><span id="summaryDeliveryFee" data-i18n="price_tbd">à confirmer</span></div>
+          <div class="summary-row" id="summaryDeliveryFeeRow" style="display:none;"><span>Supplément livraison</span><span id="summaryDeliveryFee">à confirmer</span></div>
           <div class="summary-row total"><span data-i18n="summary_total">Total estimé</span><span id="summaryTotal">—</span></div>
         </div>
 
