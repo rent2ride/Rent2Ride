@@ -17,7 +17,8 @@
    - ALLOWED_ORIGIN   (texte)   : https://rent2ride.github.io
    ========================================================= */
 
-const TABLE_NAME = "GiftCards";
+const TABLE_GIFTCARDS = "GiftCards";
+const TABLE_PROMOCODES = "PromoCodes";
 
 function corsHeaders(env) {
   return {
@@ -42,8 +43,8 @@ function generateCode() {
   return code;
 }
 
-async function airtableFetch(env, path, options = {}) {
-  const url = `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/${encodeURIComponent(TABLE_NAME)}${path}`;
+async function airtableFetch(env, table, path, options = {}) {
+  const url = `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/${encodeURIComponent(table)}${path}`;
   const res = await fetch(url, {
     ...options,
     headers: {
@@ -80,6 +81,7 @@ async function handleCreate(request, env) {
     code = generateCode();
     const check = await airtableFetch(
       env,
+      TABLE_GIFTCARDS,
       `?filterByFormula=${encodeURIComponent(`{Code}="${code}"`)}`
     );
     const checkData = await check.json();
@@ -90,7 +92,7 @@ async function handleCreate(request, env) {
     return jsonResponse({ error: "Impossible de générer un code unique, réessayez." }, 500, env);
   }
 
-  const createRes = await airtableFetch(env, "", {
+  const createRes = await airtableFetch(env, TABLE_GIFTCARDS, "", {
     method: "POST",
     body: JSON.stringify({
       fields: {
@@ -122,6 +124,7 @@ async function handleBalance(request, env) {
 
   const res = await airtableFetch(
     env,
+    TABLE_GIFTCARDS,
     `?filterByFormula=${encodeURIComponent(`{Code}="${code}"`)}`
   );
   const data = await res.json();
@@ -144,6 +147,84 @@ async function handleBalance(request, env) {
   );
 }
 
+/* ---------------------------------------------------------
+   VALIDATION CODE PROMO (côté serveur)
+   ---------------------------------------------------------
+   Le code et son pourcentage ne sont JAMAIS visibles dans le
+   code source du site (contrairement à l'ancien système en
+   dur dans main.js). Chaque appel à cette route qui valide un
+   code compte comme "une utilisation" et incrémente UsedCount
+   dans Airtable — même si le client ne va pas jusqu'au bout
+   de sa réservation. C'est un choix simple et volontaire :
+   pas de suivi de commande complète côté site statique, donc
+   on plafonne à la vérification plutôt qu'à la confirmation
+   finale. À voir si c'est suffisant selon le volume
+   réel de trafic/abus observé.
+
+   Table Airtable "PromoCodes" attendue avec les champs :
+     - Code            (texte, ex: "BIENVENUE10")
+     - DiscountPercent (nombre, ex: 10)
+     - MaxUses         (nombre, ex: 100 — vide/0 = illimité)
+     - UsedCount       (nombre, démarre à 0)
+     - Active          (case à cocher)
+
+   Limite connue : deux requêtes simultanées sur le même code
+   proche de sa limite pourraient toutes les deux passer avant
+   que le compteur soit mis à jour (pas de verrou atomique côté
+   Airtable via API REST standard). Risque faible vu le volume
+   attendu d'un site de location de motos, mais à garder en tête.
+   --------------------------------------------------------- */
+async function handleValidatePromo(request, env) {
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return jsonResponse({ error: "Corps de requête invalide." }, 400, env);
+  }
+
+  const code = (body.code || "").trim().toUpperCase();
+  if (!code) {
+    return jsonResponse({ error: "Code manquant." }, 400, env);
+  }
+
+  const res = await airtableFetch(
+    env,
+    TABLE_PROMOCODES,
+    `?filterByFormula=${encodeURIComponent(`{Code}="${code}"`)}`
+  );
+  const data = await res.json();
+  const record = (data.records || [])[0];
+
+  if (!record) {
+    return jsonResponse({ valid: false, reason: "not_found" }, 200, env);
+  }
+
+  const f = record.fields;
+  const active = f.Active === true;
+  const usedCount = Number(f.UsedCount || 0);
+  const maxUses = Number(f.MaxUses || 0); // 0 ou vide = illimité
+  const maxedOut = maxUses > 0 && usedCount >= maxUses;
+
+  if (!active) {
+    return jsonResponse({ valid: false, reason: "inactive" }, 200, env);
+  }
+  if (maxedOut) {
+    return jsonResponse({ valid: false, reason: "max_uses_reached" }, 200, env);
+  }
+
+  // Incrémente le compteur d'utilisation (voir limite connue ci-dessus).
+  await airtableFetch(env, TABLE_PROMOCODES, `/${record.id}`, {
+    method: "PATCH",
+    body: JSON.stringify({ fields: { UsedCount: usedCount + 1 } }),
+  });
+
+  return jsonResponse(
+    { valid: true, discountPercent: Number(f.DiscountPercent || 0) },
+    200,
+    env
+  );
+}
+
 export default {
   async fetch(request, env) {
     if (request.method === "OPTIONS") {
@@ -157,6 +238,9 @@ export default {
     }
     if (url.pathname === "/balance" && request.method === "GET") {
       return handleBalance(request, env);
+    }
+    if (url.pathname === "/validate-promo" && request.method === "POST") {
+      return handleValidatePromo(request, env);
     }
 
     return jsonResponse({ error: "Route inconnue." }, 404, env);

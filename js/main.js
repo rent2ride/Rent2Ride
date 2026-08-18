@@ -85,15 +85,15 @@ function isModelPermanentlyUnavailable(model){
 /* =========================================================
    CODES PROMO
    ---------------------------------------------------------
-   Ajoutez/modifiez/supprimez librement des lignes ici. La clé
-   est le code tel que le client le tape (majuscule/minuscule
-   n'a pas d'importance, il est normalisé en majuscules), la
-   valeur est le pourcentage de réduction appliqué au total.
+   Les codes et pourcentages ne sont PLUS stockés ici (ancien
+   système visible dans le code source du site — corrigé le
+   17/08/2026). La validation se fait désormais côté serveur,
+   via le Worker Cloudflare existant (endpoint /validate-promo),
+   qui interroge une table Airtable "PromoCodes". Voir worker.js.
+
+   appliedPromoCode contient désormais soit null, soit un objet
+   { code, percent } renvoyé par le serveur après validation.
    ========================================================= */
-const PROMO_CODES = {
-  "BIENVENUE10": 10,
-  "PARRAIN15": 15,
-};
 let appliedPromoCode = null;
 
 /* WhatsApp business number, international format, no spaces or symbols.
@@ -396,11 +396,11 @@ function updateBookingSummary(){
   const baseForDiscount = total; // la reduction promo s'applique sur le tarif de location, pas sur le supplement horaire
 
   if (appliedPromoCode && total > 0){
-    const pct = PROMO_CODES[appliedPromoCode];
+    const pct = appliedPromoCode.percent;
     const discountAmount = Math.round(baseForDiscount * pct / 100);
     const finalTotal = baseForDiscount - discountAmount + hoursFee;
     if (discountRow) discountRow.style.display = "flex";
-    if (discountOut) discountOut.textContent = `-${discountAmount} € (${appliedPromoCode})`;
+    if (discountOut) discountOut.textContent = `-${discountAmount} € (${appliedPromoCode.code})`;
     totalOut.textContent = `${finalTotal} €`;
   } else {
     if (discountRow) discountRow.style.display = "none";
@@ -414,28 +414,61 @@ function initPromoCode(){
   const feedback = document.getElementById("promoCodeFeedback");
   if (!input || !btn) return;
 
-  btn.addEventListener("click", () => {
+  btn.addEventListener("click", async () => {
     const code = input.value.trim().toUpperCase();
     const lang = getCurrentLang();
+
     if (!code){
       appliedPromoCode = null;
       updateBookingSummary();
       return;
     }
-    if (PROMO_CODES[code]){
-      appliedPromoCode = code;
-      if (feedback){
-        feedback.textContent = `${TRANSLATIONS.promo_valid[lang]} (-${PROMO_CODES[code]}%)`;
-        feedback.className = "promo-feedback is-valid";
+
+    // État "vérification en cours" pour éviter les doubles clics
+    // pendant l'appel réseau, et donner un retour visuel clair.
+    btn.disabled = true;
+    const originalLabel = btn.textContent;
+    btn.textContent = "...";
+    if (feedback){
+      feedback.textContent = "";
+      feedback.className = "promo-feedback";
+    }
+
+    try {
+      const base = window.GIFTCARD_API_BASE; // même Worker que les bons cadeaux
+      const res = await fetch(`${base}/validate-promo`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code }),
+      });
+      const data = await res.json();
+
+      if (data.valid){
+        appliedPromoCode = { code, percent: data.discountPercent };
+        if (feedback){
+          feedback.textContent = `${TRANSLATIONS.promo_valid[lang]} (-${data.discountPercent}%)`;
+          feedback.className = "promo-feedback is-valid";
+        }
+      } else {
+        appliedPromoCode = null;
+        if (feedback){
+          feedback.textContent = TRANSLATIONS.promo_invalid[lang];
+          feedback.className = "promo-feedback is-invalid";
+        }
       }
-    } else {
+    } catch (err){
+      // Panne réseau / Worker injoignable : on n'applique rien,
+      // pas de fausse réduction en cas d'erreur silencieuse.
       appliedPromoCode = null;
       if (feedback){
         feedback.textContent = TRANSLATIONS.promo_invalid[lang];
         feedback.className = "promo-feedback is-invalid";
       }
+    } finally {
+      btn.disabled = false;
+      btn.textContent = originalLabel;
+      updateBookingSummary();
     }
-    updateBookingSummary();
   });
 }
 
@@ -464,11 +497,11 @@ function buildBookingSummaryText(form, modelKey){
 
   let finalTotal = total + hoursFee;
   let discountLine = "";
-  if (appliedPromoCode && PROMO_CODES[appliedPromoCode] && total > 0){
-    const pct = PROMO_CODES[appliedPromoCode];
+  if (appliedPromoCode && total > 0){
+    const pct = appliedPromoCode.percent;
     const discountAmount = Math.round(total * pct / 100);
     finalTotal = total - discountAmount + hoursFee;
-    discountLine = `\nCode promo : ${appliedPromoCode} (-${discountAmount} €)`;
+    discountLine = `\nCode promo : ${appliedPromoCode.code} (-${discountAmount} €)`;
   }
   const hoursFeeLine = hoursFee > 0 ? `\nSupplément hors horaires : +${hoursFee} €` : "";
 
