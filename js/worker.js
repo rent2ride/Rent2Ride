@@ -174,7 +174,8 @@ async function handleBalance(request, env) {
    Airtable via API REST standard). Risque faible vu le volume
    attendu d'un site de location de motos, mais à garder en tête.
    --------------------------------------------------------- */
-async function handleValidatePromo(request, env) {
+  const TABLE_LOYALTY = "Clients_Fidelite";
+   async function handleValidatePromo(request, env) {
   let body;
   try {
     body = await request.json();
