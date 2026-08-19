@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rent2Ride Club — Programme fidélité</title>
+<meta name="description" content="Suivez votre statut Rent2Ride Club, vos réductions fidélité et votre code de parrainage.">
+
+<!-- ============================================================
+     INTEGRATION NOTE (à lire avant de coller dans le repo) :
+     1. Remplace ce <head> par ton head standard (favicon, css/main.css,
+        css/components.css, i18n.js, etc.) comme sur les autres pages.
+     2. Colle ton header/footer habituels (copié-collé comme les 25
+        autres pages) aux emplacements marqués <!-- HEADER --> et
+        <!-- FOOTER -->.
+     3. Remplace WORKER_URL plus bas par l'URL réelle de ton Worker
+        une fois la route /loyalty-status ajoutée (voir message Claude
+        pour le code du Worker).
+     ============================================================ -->
+
+<style>
+  :root{
+    --r2r-black: #0b0b0d;
+    --r2r-charcoal: #17181c;
+    --r2r-gold: #c9a24b;
+    --r2r-gold-soft: rgba(201,162,75,0.15);
+    --r2r-white: #f5f3ee;
+    --r2r-grey: #9a9a9f;
+    --r2r-line: rgba(245,243,238,0.08);
+    --r2r-danger: #d9694f;
+  }
+
+  * { box-sizing: border-box; }
+
+  body.loyalty-page {
+    background: var(--r2r-black);
+    color: var(--r2r-white);
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  .loyalty-wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 64px 24px 96px;
+  }
+
+  .loyalty-eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 12px;
+    color: var(--r2r-gold);
+    margin-bottom: 12px;
+  }
+
+  .loyalty-title {
+    font-size: clamp(32px, 5vw, 48px);
+    line-height: 1.05;
+    margin: 0 0 16px;
+    font-weight: 700;
+  }
+
+  .loyalty-sub {
+    color: var(--r2r-grey);
+    font-size: 16px;
+    max-width: 560px;
+    margin: 0 0 48px;
+    line-height: 1.6;
+  }
+
+  /* ---- Lookup box ---- */
+  .lookup-card {
+    background: var(--r2r-charcoal);
+    border: 1px solid var(--r2r-line);
+    border-radius: 14px;
+    padding: 28px;
+    margin-bottom: 56px;
+  }
+
+  .lookup-form {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .lookup-form input[type="email"] {
+    flex: 1 1 260px;
+    background: var(--r2r-black);
+    border: 1px solid var(--r2r-line);
+    border-radius: 8px;
+    padding: 14px 16px;
+    color: var(--r2r-white);
+    font-size: 15px;
+  }
+
+  .lookup-form input[type="email"]:focus {
+    outline: none;
+    border-color: var(--r2r-gold);
+  }
+
+  .lookup-form button {
+    background: var(--r2r-gold);
+    color: var(--r2r-black);
+    border: none;
+    border-radius: 8px;
+    padding: 14px 28px;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+
+  .lookup-form button:hover { opacity: 0.85; }
+  .lookup-form button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .lookup-hint {
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--r2r-grey);
+  }
+
+  /* ---- Result states ---- */
+  #loyaltyResult { display: none; }
+  #loyaltyError { display: none; }
+  #loyaltyLoading { display: none; }
+
+  .loyalty-status-card {
+    background: var(--r2r-charcoal);
+    border: 1px solid var(--r2r-line);
+    border-radius: 14px;
+    padding: 32px;
+    margin-bottom: 32px;
+  }
+
+  .status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .status-name { font-size: 20px; font-weight: 700; }
+
+  .status-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    background: var(--r2r-gold-soft);
+    color: var(--r2r-gold);
+    border: 1px solid var(--r2r-gold);
+  }
+
+  .progress-track {
+    height: 8px;
+    background: var(--r2r-black);
+    border-radius: 999px;
+    overflow: hidden;
+    margin: 8px 0 10px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--r2r-gold), #e8c874);
+    border-radius: 999px;
+    transition: width 0.6s ease;
+    width: 0%;
+  }
+
+  .progress-caption {
+    font-size: 13px;
+    color: var(--r2r-grey);
+  }
+
+  .tiers-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 28px;
+  }
+
+  .tier-item {
+    border: 1px solid var(--r2r-line);
+    border-radius: 10px;
+    padding: 14px 12px;
+    text-align: center;
+    font-size: 13px;
+  }
+
+  .tier-item.tier-reached {
+    border-color: var(--r2r-gold);
+    background: var(--r2r-gold-soft);
+  }
+
+  .tier-item .tier-pct {
+    display: block;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--r2r-gold);
+    margin-bottom: 4px;
+  }
+
+  .referral-card {
+    background: var(--r2r-charcoal);
+    border: 1px solid var(--r2r-line);
+    border-radius: 14px;
+    padding: 32px;
+  }
+
+  .referral-card h3 {
+    margin: 0 0 8px;
+    font-size: 17px;
+  }
+
+  .referral-card p {
+    color: var(--r2r-grey);
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0 0 20px;
+  }
+
+  .referral-code-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--r2r-black);
+    border: 1px dashed var(--r2r-gold);
+    border-radius: 8px;
+    padding: 14px 18px;
+  }
+
+  .referral-code-box code {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--r2r-gold);
+    flex: 1;
+  }
+
+  .referral-code-box button {
+    background: transparent;
+    border: 1px solid var(--r2r-line);
+    color: var(--r2r-white);
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .referral-code-box button:hover { border-color: var(--r2r-gold); }
+
+  /* ---- Error / loading ---- */
+  .loyalty-msg {
+    padding: 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  #loyaltyError {
+    background: rgba(217,105,79,0.1);
+    border: 1px solid var(--r2r-danger);
+    color: #f0b9ab;
+  }
+
+  #loyaltyLoading {
+    color: var(--r2r-grey);
+  }
+
+  /* ---- Static tiers explainer (always visible) ---- */
+  .tiers-explainer {
+    margin-top: 64px;
+    border-top: 1px solid var(--r2r-line);
+    padding-top: 40px;
+  }
+
+  .tiers-explainer h2 {
+    font-size: 22px;
+    margin-bottom: 24px;
+  }
+
+  .explainer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+
+  .explainer-item {
+    border: 1px solid var(--r2r-line);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .explainer-item .num {
+    color: var(--r2r-gold);
+    font-size: 24px;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .explainer-item .desc {
+    font-size: 13px;
+    color: var(--r2r-grey);
+    line-height: 1.5;
+  }
+
+  @media (max-width: 640px) {
+    .tiers-list { grid-template-columns: 1fr; }
+    .lookup-form { flex-direction: column; }
+    .lookup-form button { width: 100%; }
+  }
+</style>
+</head>
+<body class="loyalty-page">
+
+<!-- HEADER -->
+
+<main class="loyalty-wrap">
+
+  <div class="loyalty-eyebrow">RENT2RIDE CLUB</div>
+  <h1 class="loyalty-title">Votre fidélité,<br>récompensée sur la route.</h1>
+  <p class="loyalty-sub">
+    Entrez l'email utilisé lors de vos réservations pour voir votre statut,
+    votre progression et votre code de parrainage.
+  </p>
+
+  <div class="lookup-card">
+    <form class="lookup-form" id="loyaltyForm">
+      <input type="email" id="loyaltyEmail" placeholder="votre@email.com" required autocomplete="email">
+      <button type="submit" id="loyaltySubmit">Voir mon statut</button>
+    </form>
+    <p class="lookup-hint">
+      Réservations effectuées via Momoven ou en direct — la réduction est appliquée
+      manuellement lors de la confirmation de votre location.
+    </p>
+  </div>
+
+  <div id="loyaltyLoading" class="loyalty-msg">Recherche de votre profil…</div>
+
+  <div id="loyaltyError" class="loyalty-msg">
+    Aucun profil trouvé pour cet email. Si vous avez déjà loué avec nous,
+    contactez-nous sur WhatsApp pour vérifier votre compte.
+  </div>
+
+  <div id="loyaltyResult">
+    <div class="loyalty-status-card">
+      <div class="status-row">
+        <span class="status-name" id="rName">—</span>
+        <span class="status-badge" id="rBadge">—</span>
+      </div>
+
+      <div class="progress-track">
+        <div class="progress-fill" id="rProgressFill"></div>
+      </div>
+      <div class="progress-caption" id="rProgressCaption">—</div>
+
+      <div class="tiers-list" id="rTiersList">
+        <div class="tier-item" data-tier="5">
+          <span class="tier-pct">−5%</span>
+          5 locations
+        </div>
+        <div class="tier-item" data-tier="10">
+          <span class="tier-pct">−10%</span>
+          10 locations
+        </div>
+        <div class="tier-item" data-tier="20">
+          <span class="tier-pct">−15% · VIP</span>
+          20 locations
+        </div>
+      </div>
+    </div>
+
+    <div class="referral-card">
+      <h3>Parrainage</h3>
+      <p>50 € de crédit pour vous et votre filleul, dès sa première location confirmée.</p>
+      <div class="referral-code-box">
+        <code id="rReferralCode">—</code>
+        <button type="button" id="rCopyBtn">Copier</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="tiers-explainer">
+    <h2>Comment ça marche</h2>
+    <div class="explainer-grid">
+      <div class="explainer-item">
+        <span class="num">5</span>
+        <div class="desc">locations = −5% permanent sur toutes vos futures réservations</div>
+      </div>
+      <div class="explainer-item">
+        <span class="num">10</span>
+        <div class="desc">locations = −10% appliqué automatiquement à chaque réservation</div>
+      </div>
+      <div class="explainer-item">
+        <span class="num">20</span>
+        <div class="desc">locations = −15% + statut VIP et accès prioritaire aux nouvelles motos</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+
+<script>
+(function () {
+  // TODO: remplacer par l'URL réelle une fois la route /loyalty-status
+  // ajoutée à ton Worker Cloudflare existant (rent2ride-giftcards ou nouveau).
+  const WORKER_URL = "https://rent2ride-giftcards.sch-eric-es.workers.dev/loyalty-status";
+
+  const form = document.getElementById("loyaltyForm");
+  const emailInput = document.getElementById("loyaltyEmail");
+  const submitBtn = document.getElementById("loyaltySubmit");
+
+  const loadingEl = document.getElementById("loyaltyLoading");
+  const errorEl = document.getElementById("loyaltyError");
+  const resultEl = document.getElementById("loyaltyResult");
+
+  const TIER_THRESHOLDS = [5, 10, 20];
+  const TIER_LABELS = { 0: "Nouveau", 5: "Fidèle −5%", 10: "Fidèle −10%", 20: "VIP −15%" };
+
+  function resetStates() {
+    loadingEl.style.display = "none";
+    errorEl.style.display = "none";
+    resultEl.style.display = "none";
+  }
+
+  function currentTier(n) {
+    if (n >= 20) return 20;
+    if (n >= 10) return 10;
+    if (n >= 5) return 5;
+    return 0;
+  }
+
+  function nextThreshold(n) {
+    for (const t of TIER_THRESHOLDS) {
+      if (n < t) return t;
+    }
+    return null; // already at max tier
+  }
+
+  function renderResult(data) {
+    // Expected shape from Worker:
+    // { name, nbLocations, referralCode }
+    const n = Number(data.nbLocations || 0);
+    const tier = currentTier(n);
+    const next = nextThreshold(n);
+
+    document.getElementById("rName").textContent = data.name || "Membre Rent2Ride";
+    document.getElementById("rBadge").textContent = TIER_LABELS[tier];
+
+    const progressFill = document.getElementById("rProgressFill");
+    const progressCaption = document.getElementById("rProgressCaption");
+
+    if (next) {
+      const prevThreshold = tier;
+      const pct = Math.min(100, Math.round(((n - prevThreshold) / (next - prevThreshold)) * 100));
+      progressFill.style.width = pct + "%";
+      progressCaption.textContent = `${n} location${n > 1 ? "s" : ""} — plus que ${next - n} avant −${next === 5 ? 5 : next === 10 ? 10 : 15}%`;
+    } else {
+      progressFill.style.width = "100%";
+      progressCaption.textContent = `${n} locations — statut VIP atteint`;
+    }
+
+    document.querySelectorAll(".tier-item").forEach((el) => {
+      const t = Number(el.getAttribute("data-tier"));
+      el.classList.toggle("tier-reached", n >= t);
+    });
+
+    document.getElementById("rReferralCode").textContent = data.referralCode || "Disponible après votre 1ère location";
+
+    resultEl.style.display = "block";
+  }
+
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const email = emailInput.value.trim();
+    if (!email) return;
+
+    resetStates();
+    loadingEl.style.display = "block";
+    submitBtn.disabled = true;
+
+    try {
+      const res = await fetch(WORKER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      loadingEl.style.display = "none";
+
+      if (!res.ok) {
+        errorEl.style.display = "block";
+        return;
+      }
+
+      const data = await res.json();
+
+      if (!data || !data.found) {
+        errorEl.style.display = "block";
+        return;
+      }
+
+      renderResult(data);
+    } catch (err) {
+      loadingEl.style.display = "none";
+      errorEl.style.display = "block";
+      console.error("Loyalty lookup error:", err);
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+
+  document.getElementById("rCopyBtn").addEventListener("click", function () {
+    const code = document.getElementById("rReferralCode").textContent;
+    if (!code || code.includes("Disponible")) return;
+    navigator.clipboard.writeText(code).then(() => {
+      this.textContent = "Copié !";
+      setTimeout(() => { this.textContent = "Copier"; }, 1500);
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

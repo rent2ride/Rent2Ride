@@ -242,6 +242,9 @@ export default {
     if (url.pathname === "/validate-promo" && request.method === "POST") {
       return handleValidatePromo(request, env);
     }
+    if (url.pathname === "/loyalty-status" && request.method === "POST") {
+      return handleLoyaltyStatus(request, env);
+    }
 
     return jsonResponse({ error: "Route inconnue." }, 404, env);
   },
