@@ -65,6 +65,24 @@ const PRICING = {
 };
 
 /* =========================================================
+   PACKS (page "Nos offres")
+   ---------------------------------------------------------
+   Source de vérité pour le système "?pack=xxx" qui relie un
+   clic sur "Réserver ce pack" (offres.html) au formulaire de
+   réservation (reservation.html). Si vous changez un nom ou
+   une durée de pack dans le HTML de offres.html, changez-le
+   aussi ici pour rester cohérent.
+   ========================================================= */
+const PACKS = {
+  p1: { name: "Explorer",        days: 1  },
+  p2: { name: "Weekend Escape",  days: 2  },
+  p3: { name: "Costa Ride",      days: 3  },
+  p4: { name: "Freedom",         days: 5  },
+  p5: { name: "Adventure Week",  days: 7  },
+  p6: { name: "Grand Tour",      days: 14 },
+};
+
+/* =========================================================
    MODÈLES TEMPORAIREMENT INDISPONIBLES
    ---------------------------------------------------------
    Source de vérité UNIQUE pour "ce modèle n'est pas louable
@@ -209,6 +227,7 @@ function initMobileNav(){
 let calendarViewDate = new Date();
 calendarViewDate.setDate(1);
 let selectedRange = { start: null, end: null };
+let selectedPackId = null; // pack choisi via ?pack= (voir initBookingForm), inclus dans le récapitulatif
 
 /* Noms de mois et abréviations de jours (lundi en premier, car
    renderCalendar() calcule le décalage du 1er du mois sur cette
@@ -504,8 +523,12 @@ function buildBookingSummaryText(form, modelKey){
     discountLine = `\nCode promo : ${appliedPromoCode.code} (-${discountAmount} €)`;
   }
   const hoursFeeLine = hoursFee > 0 ? `\nSupplément hors horaires : +${hoursFee} €` : "";
+  const packLine = selectedPackId && PACKS[selectedPackId]
+    ? `Pack demandé : ${PACKS[selectedPackId].name} (${PACKS[selectedPackId].days} jours)\n`
+    : "";
 
   return `Demande de réservation Rent2Ride\n\n` +
+    packLine +
     `Moto : ${modelName}\n` +
     `Du ${formatBookingDate(selectedRange.start)} au ${formatBookingDate(selectedRange.end)} (${days} jours)\n` +
     `Collecte : ${pickupTimeLabel}   Retour : ${returnTimeLabel}\n` +
@@ -549,6 +572,47 @@ function initBookingForm(){
     if (requestedModel && PRICING[requestedModel] && !isModelPermanentlyUnavailable(requestedModel)){
       modelSelect.value = requestedModel;
     }
+  }
+
+  /* =========================================================
+     PRÉ-SÉLECTION DEPUIS UN PACK (page "Nos offres")
+     ---------------------------------------------------------
+     Quand le client clique "Réserver ce pack" sur offres.html,
+     le lien contient ?pack=p1 (voir PACKS ci-dessus). On :
+       1. Mémorise le pack choisi dans selectedPackId, pour
+          l'ajouter au récapitulatif envoyé par WhatsApp/e-mail/
+          Telegram (voir buildBookingSummaryText) — c'est ce qui
+          permet de savoir quel pack le client a demandé.
+       2. Pré-remplit automatiquement les dates dans le
+          calendrier (demain → demain + N jours) pour lui éviter
+          une saisie manuelle.
+       3. Affiche une bannière de confirmation au-dessus du
+          formulaire, pour que le client voie bien quel pack il
+          est en train de réserver.
+     Si aucun ?pack= n'est présent (client arrivé directement
+     sur reservation.html), tout ce bloc est simplement ignoré.
+     ========================================================= */
+  const packParams = new URLSearchParams(window.location.search);
+  const requestedPack = packParams.get("pack");
+  if (requestedPack && PACKS[requestedPack]){
+    selectedPackId = requestedPack;
+    const pack = PACKS[requestedPack];
+
+    const start = new Date();
+    start.setDate(start.getDate() + 1);
+    start.setHours(0,0,0,0);
+    const end = new Date(start);
+    end.setDate(end.getDate() + pack.days - 1);
+    selectedRange = { start, end };
+    syncDateInputs();
+    renderCalendar();
+    updateBookingSummary();
+
+    const banner = document.createElement("div");
+    banner.className = "pack-selected-banner";
+    banner.style.cssText = "background:var(--c-primary,#1a1a1a); color:#fff; padding:12px 18px; border-radius:8px; margin-bottom:18px; font-size:0.95rem;";
+    banner.textContent = `Pack sélectionné : ${pack.name} (${pack.days} jour${pack.days > 1 ? "s" : ""}) — modifiable ci-dessous si besoin.`;
+    form.parentNode.insertBefore(banner, form);
   }
 
   form.addEventListener("submit", e => {
@@ -610,6 +674,7 @@ function initBookingForm(){
     }
     form.reset();
     selectedRange = { start: null, end: null };
+    selectedPackId = null;
     appliedPromoCode = null;
     const promoFeedback = document.getElementById("promoCodeFeedback");
     if (promoFeedback) promoFeedback.textContent = "";

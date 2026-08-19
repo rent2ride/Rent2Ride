@@ -807,6 +807,7 @@ const TRANSLATIONS = {
   team_eloy_bio: { fr: "Passionné de moto, il est sur place à Barcelone : il prépare chaque moto et accueille les clients en personne.",
                     es: "Apasionado de la moto, está en Barcelona: prepara cada moto y recibe a los clientes en persona.",
                     en: "A true motorcycle enthusiast, based in Barcelona, he prepares every bike and welcomes clients in person." },
+  team_eloy_phone_label:{ fr: "Tél.", es: "Tel.", en: "Phone" },
 
   /* ---------------- BOUTIQUE (shop) ---------------- */
   title_shop:      { fr: "Boutique — Rent2Ride", es: "Tienda — Rent2Ride", en: "Shop — Rent2Ride" },
