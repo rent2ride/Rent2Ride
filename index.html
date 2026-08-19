@@ -1,12 +1,23 @@
 <!DOCTYPE html>
-<html lang="fr" id="htmlRoot">
+<html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rent2Ride — Bientôt disponible</title>
-<meta name="description" content="Rent2Ride, location de motos sur la Costa del Sol. Le site arrive très bientôt.">
-<meta name="robots" content="noindex">
-<meta name="google-site-verification" content="KeyfB45eFGhDhpVowBp1KE3Sq1OamEByYlI-zUFpJso" />
+<title data-i18n="title_home">Rent2Ride — Location de motos Costa del Sol</title>
+<meta name="description" content="Location de motos premium sur la Costa del Sol. Yamaha MT-07, MT-09, Tracer 7, Tracer 9. Réservation en ligne, assurance incluse, assistance 24/7.">
+<link rel="canonical" href="https://rent2ride.github.io/Rent2Ride/">
+<meta property="og:title" content="Rent2Ride — Location de motos Costa del Sol">
+<meta property="og:description" content="Location de motos premium sur la Costa del Sol. Yamaha MT-07, MT-09, Tracer 7, Tracer 9. Réservation en ligne, assurance incluse, assistance 24/7.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rent2ride.github.io/Rent2Ride/">
+<meta property="og:image" content="https://rent2ride.github.io/Rent2Ride/images/route-coast.jpg">
+<meta property="og:locale" content="fr_FR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Rent2Ride — Location de motos Costa del Sol">
+<meta name="twitter:description" content="Location de motos premium sur la Costa del Sol. Yamaha MT-07, MT-09, Tracer 7, Tracer 9. Réservation en ligne, assurance incluse, assistance 24/7.">
+<meta name="twitter:image" content="https://rent2ride.github.io/Rent2Ride/images/route-coast.jpg">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#E0383A">
 <link rel="icon" type="image/png" href="./favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,126 +25,517 @@
 <link rel="stylesheet" href="./css/base.css">
 <link rel="stylesheet" href="./css/components.css?v=2">
 <style>
-  .soon-page{
-    min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center;
-    text-align:center; padding:40px 24px;
-    background:var(--c-dark); color:#fff;
+  @font-face{
+    font-family:'Webrush';
+    src:url('./fonts/Webrush-Demo.ttf') format('truetype');
+    font-weight:normal;
+    font-style:normal;
+    font-display:swap;
   }
-  .soon-logo{ max-width:280px; width:100%; height:auto; filter:brightness(0) invert(1); margin-bottom:32px; }
-  .soon-eyebrow{
-    font-size:.8rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
-    color:var(--c-accent); margin:0 0 14px;
+  .hero-content h1{
+    font-family:'Webrush', var(--f-display), cursive;
+    font-weight:400;
+    letter-spacing:.02em;
+    line-height:1.2;
+    text-transform:uppercase;
+    text-shadow:0 3px 18px rgba(0,0,0,.45);
   }
-  .soon-title{ font-family:var(--f-display); font-size:clamp(1.8rem,4.5vw,2.8rem); margin:0 0 16px; font-weight:600; }
-  .soon-text{ color:rgba(255,255,255,.75); max-width:480px; margin:0 0 36px; line-height:1.6; }
-  .soon-actions{ display:flex; gap:14px; flex-wrap:wrap; justify-content:center; }
+  @media (max-width:600px){
+    .hero-content h1{ font-size:clamp(1.9rem,9vw,2.4rem); }
+  }
 </style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "MotorcycleRental",
+  "name": "Rent2Ride",
+  "description": "Location de motos premium sur la Costa del Sol. Yamaha MT-07, MT-09, Tracer 7, Tracer 9. Assurance incluse, kilométrage illimité, assistance 24/7.",
+  "url": "https://rent2ride.github.io/Rent2Ride/",
+  "telephone": "+33688133895",
+  "email": "info@rent2ride.com",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Barcelone",
+    "addressCountry": "ES"
+  },
+  "priceRange": "89€ - 949€",
+  "openingHours": "Mo-Su 09:00-19:00"
+}
+</script>
 </head>
 <body>
 
-<div class="soon-page">
-  <div class="lang-switch" style="margin-bottom:20px;" id="soonLangSwitch">
-    <button data-lang="fr" class="active">FR</button>
-    <button data-lang="es">ES</button>
-    <button data-lang="en">EN</button>
-  </div>
-  <img src="./images/logo-signature.png" alt="Rent2Ride" class="soon-logo">
-  <p class="soon-eyebrow" data-i18n="soon_eyebrow">Bientôt disponible</p>
-  <h1 class="soon-title" data-i18n="soon_title">Le site arrive très prochainement</h1>
-  <p class="soon-text" data-i18n="soon_text">Nous préparons votre expérience de location de motos sur la Costa del Sol. Une question en attendant ? Contactez-nous directement.</p>
-  <p class="soon-text" style="margin-top:-20px; display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap;">
-    <span data-i18n="soon_momoven_text">En attendant, vous pouvez déjà louer notre moto sur</span>
-    <a href="https://www.momoven.es/cuenta-motos" id="momovenLink" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; background:#fff; padding:6px 12px; border-radius:6px;">
-      <img src="./images/logo-momoven.svg" alt="Momoven" style="height:20px; width:auto; vertical-align:middle;">
+<!-- ================= HEADER ================= -->
+<header class="site-header">
+  <nav class="nav">
+    <a href="index.html" class="logo">
+      <img src="./images/logo-signature.png" alt="Rent2Ride — Your Ride. Your Freedom." class="logo-full">
     </a>
-  </p>
-  <div class="soon-actions">
-    <a href="https://wa.me/33688133895" target="_blank" rel="noopener" class="btn btn-primary" style="display:inline-flex; align-items:center; gap:8px;">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="#25D366" aria-hidden="true">
-        <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.44.79 3.07 1.2 4.74 1.2h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.86 9.86 0 0 0 12.04 2zm5.8 14.06c-.24.68-1.4 1.3-1.93 1.38-.5.08-1.12.11-1.81-.11-.42-.13-.95-.31-1.64-.6-2.89-1.25-4.78-4.16-4.92-4.35-.14-.19-1.18-1.57-1.18-3 0-1.43.75-2.13 1.02-2.42.27-.29.58-.36.78-.36.19 0 .39 0 .56.01.18.01.42-.07.66.5.24.58.83 1.99.9 2.14.07.14.11.31.02.5-.09.19-.14.31-.28.48-.14.17-.29.37-.42.5-.14.14-.28.28-.12.55.16.28.72 1.19 1.55 1.93 1.06.95 1.96 1.24 2.24 1.38.28.14.44.12.6-.07.17-.19.71-.83.9-1.11.19-.28.38-.24.63-.14.26.09 1.65.78 1.94.93.28.14.47.21.54.33.07.12.07.7-.17 1.38z"/>
-      </svg>
-      <span data-i18n="soon_whatsapp_btn">Nous écrire sur WhatsApp</span>
-    </a>
+    <button class="burger" aria-label="Menu" aria-expanded="false">&#9776;</button>
+    <div class="nav-links">
+      <a href="index.html" class="active" data-i18n="nav_home">Accueil</a>
+      <a href="catalogue.html" data-i18n="nav_fleet">Catalogue motos</a>
+      <a href="offres.html" data-i18n="nav_packs">Nos offres</a>
+      <a href="reservation.html" data-i18n="nav_booking">Réservation</a>
+      <a href="balades.html" data-i18n="nav_rides">Balades</a>
+      <a href="galerie.html" data-i18n="nav_gallery">Galerie</a>
+      <a href="avis.html" data-i18n="nav_reviews">Avis clients</a>
+      <a href="faq.html" data-i18n="nav_faq">FAQ</a>
+      <a href="blog.html" data-i18n="nav_blog">Blog</a>
+      <a href="contact.html" data-i18n="nav_contact">Contact</a>
+      <a href="boutique.html" data-i18n="nav_shop">Boutique</a>
+      <a href="reservation.html#booking" class="btn btn-primary nav-cta" data-i18n="nav_book">Réserver</a>
+    </div>
+    <div class="nav-right">
+      <div class="lang-switch">
+        <button data-lang="fr">FR</button>
+        <button data-lang="es">ES</button>
+        <button data-lang="en">EN</button>
+      </div>
+      <button class="cart-toggle" aria-label="Panier" title="Panier">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.5 3h2l2.6 12.4a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 2-1.6L21 7H6"/></svg>
+        <span class="cart-badge">0</span>
+      </button>
+      <a href="reservation.html#booking" class="btn btn-primary" data-i18n="nav_book">Réserver</a>
+    </div>
+  </nav>
+</header>
+
+<!-- ================= HERO ================= -->
+<!-- ================= HERO avec vidéo de fond ================= -->
+<!-- VIDEO SLOT : uploadez votre fichier vidéo sur GitHub dans images/
+     et renommez-le exactement : hero-video.mp4
+     Format recommandé : MP4 (H.264), 1920x1080, durée 15-60s
+     La vidéo tourne en boucle, sans son, automatiquement.
+     Si la vidéo ne charge pas, la photo hero.jpg s'affiche à la place. -->
+<section class="hero hero-video-section" id="heroCarousel">
+  <!-- Vidéo de fond : nommez votre fichier exactement "hero-video.mp4"
+       et déposez-le dans le dossier images/ du site.
+       Si le fichier est absent ou ne charge pas, la photo hero.jpg
+       (poster) s'affiche à la place automatiquement. -->
+  <video class="hero-video-bg" autoplay muted loop playsinline poster="./images/hero.png">
+    <source src="./images/hero-video.mp4" type="video/mp4">
+  </video>
+  <!-- Carrousel de photos en fondu automatique (repli si la vidéo est absente) -->
+  <div class="hero-carousel">
+    <div class="hero-slide is-active" style="background-image:url('./images/index-1.jpg')"></div>
+    <div class="hero-slide" style="background-image:url('./images/index-2.jpg')"></div>
+    <div class="hero-slide" style="background-image:url('./images/index-3.jpg')"></div>
+    <div class="hero-slide" style="background-image:url('./images/index-4.jpg')"></div>
+    <div class="hero-slide" style="background-image:url('./images/index-5.jpg')"></div>
+    <div class="hero-slide" style="background-image:url('./images/index-6.jpg')"></div>
   </div>
+  <!-- Overlay sombre pour lisibilité du texte -->
+  <div class="hero-video-overlay"></div>
+  <script>
+    (function(){
+      var section = document.getElementById('heroCarousel');
+      var video = section.querySelector('.hero-video-bg');
+      var carousel = section.querySelector('.hero-carousel');
+      if (!video || !carousel) return;
+      carousel.style.display = 'none';
+      function showCarouselFallback(){ carousel.style.display = ''; }
+      video.addEventListener('error', showCarouselFallback);
+      video.addEventListener('stalled', showCarouselFallback);
+      if (video.readyState === 0) {
+        setTimeout(function(){
+          if (video.readyState === 0) showCarouselFallback();
+        }, 4000);
+      }
+    })();
+  </script>
+  <!-- Contenu texte -->
+  <div class="hero-content">
+    <span class="hero-badge-pill" data-i18n="hero_pill">🏍️ Flotte Yamaha récente</span>
+    <h1 data-i18n="hero_title">Louez votre moto et explorez la Costa del Sol</h1>
+    <p class="hero-slogan" data-i18n="hero_slogan">Votre route. Votre rythme. Notre moto.</p>
+    <p data-i18n="hero_sub">Une flotte Yamaha récente, une réservation en ligne en 2 minutes, et des routes parmi les plus belles d'Espagne.</p>
+    <div class="hero-ctas">
+      <a href="reservation.html#booking" class="btn btn-primary btn-lg" data-i18n="hero_cta_book">Réserver maintenant</a>
+      <a href="catalogue.html" class="btn btn-outline btn-lg" data-i18n="hero_cta_fleet">Voir le catalogue</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TRUST STRIP ================= -->
+<section class="trust-strip">
+  <div class="container trust-grid">
+    <div class="trust-item">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2l8 4v6c0 5-4 8-8 10-4-2-8-5-8-10V6l8-4z"/><path d="M9 12l2 2 4-4"/></svg>
+      <div><strong data-i18n="trust1_t">Assurance incluse</strong><span data-i18n="trust1_s">Sur tous nos modèles</span></div>
+    </div>
+    <div class="trust-item">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M3 10h18M8 2v4M16 2v4"/></svg>
+      <div><strong data-i18n="trust2_t">Annulation flexible</strong><span data-i18n="trust2_s">Gratuite jusqu'à 48h avant</span></div>
+    </div>
+    <div class="trust-item">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 14a8 8 0 0 1 16 0"/><rect x="2" y="14" width="4" height="6" rx="1"/><rect x="18" y="14" width="4" height="6" rx="1"/></svg>
+      <div><strong data-i18n="trust3_t">Assistance 24/7</strong><span data-i18n="trust3_s">Sur toute l'Espagne</span></div>
+    </div>
+    <div class="trust-item">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2l3 3h5v5l3 3-3 3v5h-5l-3 3-3-3H4v-5l-3-3 3-3V5h5l3-3z"/><circle cx="12" cy="12" r="3"/></svg>
+      <div><strong data-i18n="trust4_t">Tarifs transparents</strong><span data-i18n="trust4_s">Sans frais cachés</span></div>
+    </div>
+    <div class="trust-item weather-widget" id="weatherWidget" style="display:none;">
+      <span class="weather-icon" id="weatherIcon">☀️</span>
+      <div><strong id="weatherTemp">—°C</strong><span id="weatherLocation" data-i18n="weather_location">Málaga aujourd'hui</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SIGNATURE DE MARQUE ================= -->
+<section class="brand-signature">
+  <div class="container">
+    <img src="./images/logo-signature.png" alt="Rent2Ride — Your Ride. Your Freedom." class="brand-signature-logo">
+  </div>
+</section>
+
+<!-- ================= FLEET PREVIEW ================= -->
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow" data-i18n="fleet_eyebrow">NOTRE FLOTTE</p>
+        <h2 data-i18n="fleet_title">Quatre Yamaha pour chaque type de route</h2>
+        <p data-i18n="fleet_sub">De la naked agile à la routière grand tourisme, choisissez la moto adaptée à votre itinéraire.</p>
+      </div>
+      <a href="catalogue.html" class="btn btn-ghost" data-i18n="view_all_fleet">Voir tout le catalogue</a>
+    </div>
+
+    <div class="fleet-grid">
+
+      <article class="bike-card" data-model="mt07">
+        <div class="bike-photo">
+          <img class="bike-main-img" src="./images/mt07-1.jpg" alt="Yamaha MT-07">
+          <span class="bike-badge" data-i18n="bike_mt07_tag">Naked agile · 689 cc</span>
+          <span class="bike-availability is-available"></span>
+        </div>
+        <div class="bike-gallery-thumbs">
+          <button type="button" class="bike-thumb is-active" style="background-image:url('./images/mt07-1.jpg')" data-img="./images/mt07-1.jpg" aria-label="Photo 1"></button>
+          <button type="button" class="bike-thumb" style="background-image:url('./images/mt07-2.jpg')" data-img="./images/mt07-2.jpg" aria-label="Photo 2"></button>
+          <button type="button" class="bike-thumb" style="background-image:url('./images/mt07-3.jpg')" data-img="./images/mt07-3.jpg" aria-label="Photo 3"></button>
+          <button type="button" class="bike-thumb" style="background-image:url('./images/mt07-4.jpg')" data-img="./images/mt07-4.jpg" aria-label="Photo 4"></button>
+        </div>
+        <div class="bike-body">
+          <div class="bike-top-row">
+            <div><h3 class="bike-name" data-i18n="bike_mt07_name">Yamaha MT-07</h3></div>
+          </div>
+          <ul class="bike-features">
+            <li data-i18n="bike_mt07_f1">Assurance au tiers incluse</li>
+            <li data-i18n="bike_mt07_f2">Casques (2) inclus</li>
+          </ul>
+          <div class="bike-price-row">
+            <span class="bike-price">55 € <small data-i18n="per_day">/ jour</small></span>
+            <a href="reservation.html?model=mt07#booking" class="btn btn-dark btn-sm" data-i18n="bike_cta">Réserver</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="bike-card" data-model="mt09">
+        <div class="bike-photo">
+          <img class="bike-main-img" src="./images/mt09.jpg" alt="Yamaha MT-09">
+          <span class="bike-badge" data-i18n="bike_mt09_tag">Hyper naked · 890 cc</span>
+          <span class="bike-availability is-available"></span>
+        </div>
+        <div class="bike-body">
+          <div class="bike-top-row">
+            <div><h3 class="bike-name" data-i18n="bike_mt09_name">Yamaha MT-09</h3></div>
+          </div>
+          <ul class="bike-features">
+            <li data-i18n="bike_mt09_f1">Assurance tous risques</li>
+            <li data-i18n="bike_mt09_f2">Modes de conduite réglables</li>
+          </ul>
+          <div class="bike-price-row">
+            <span class="bike-price">75 € <small data-i18n="per_day">/ jour</small></span>
+            <a href="reservation.html?model=mt09#booking" class="btn btn-dark btn-sm" data-i18n="bike_cta">Réserver</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="bike-card" data-model="tracer7">
+        <div class="bike-photo">
+          <img class="bike-main-img" src="./images/tracer7.jpg" alt="Yamaha Tracer 7">
+          <span class="bike-badge" data-i18n="bike_tracer7_tag">Routière sport · 689 cc</span>
+          <span class="bike-availability is-available"></span>
+        </div>
+        <div class="bike-body">
+          <div class="bike-top-row">
+            <div><h3 class="bike-name" data-i18n="bike_tracer7_name">Yamaha Tracer 7</h3></div>
+          </div>
+          <ul class="bike-features">
+            <li data-i18n="bike_tracer7_f1">Assurance tous risques</li>
+            <li data-i18n="bike_tracer7_f2">Valises latérales sur demande</li>
+          </ul>
+          <div class="bike-price-row">
+            <span class="bike-price">65 € <small data-i18n="per_day">/ jour</small></span>
+            <a href="reservation.html?model=tracer7#booking" class="btn btn-dark btn-sm" data-i18n="bike_cta">Réserver</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="bike-card" data-model="tracer9">
+        <div class="bike-photo">
+          <img class="bike-main-img" src="./images/tracer9.jpg" alt="Yamaha Tracer 9">
+          <span class="bike-badge" data-i18n="bike_tracer9_tag">Grand tourisme · 890 cc</span>
+          <span class="bike-availability is-unavailable"></span>
+        </div>
+        <div class="bike-body">
+          <div class="bike-top-row">
+            <div><h3 class="bike-name" data-i18n="bike_tracer9_name">Yamaha Tracer 9</h3></div>
+          </div>
+          <ul class="bike-features">
+            <li data-i18n="bike_tracer9_f1">Assurance tous risques + GPS</li>
+            <li data-i18n="bike_tracer9_f2">Valises latérales incluses</li>
+          </ul>
+          <div class="bike-price-row">
+            <span class="bike-price">89 € <small data-i18n="per_day">/ jour</small></span>
+            <a href="reservation.html?model=tracer9#booking" class="btn btn-dark btn-sm" data-i18n="bike_cta">Réserver</a>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================= INCLUDED ================= -->
+<section class="section section--cream">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow" data-i18n="included_eyebrow">TOUT EST INCLUS</p>
+        <h2 data-i18n="included_title">Tout ce qui vient avec votre location</h2>
+      </div>
+    </div>
+    <div class="included-grid">
+      <div class="included-item">
+        <div class="included-icon">&#128737;</div>
+        <div><h4 data-i18n="inc1_t">Assurance incluse</h4><p data-i18n="inc1_p">Options d'extension disponibles.</p></div>
+      </div>
+      <div class="included-item">
+        <div class="included-icon">&#129516;</div>
+        <div><h4 data-i18n="inc2_t">Équipement de protection</h4><p data-i18n="inc2_p">Casques, gants et vestes.</p></div>
+      </div>
+      <div class="included-item">
+        <div class="included-icon">&#128506;</div>
+        <div><h4 data-i18n="inc3_t">Cartes et itinéraires</h4><p data-i18n="inc3_p">Itinéraires intégrés au GPS.</p></div>
+      </div>
+      <div class="included-item">
+        <div class="included-icon">&#128295;</div>
+        <div><h4 data-i18n="inc4_t">Assistance 24/7</h4><p data-i18n="inc4_p">Équipe joignable à tout moment.</p></div>
+      </div>
+      <div class="included-item">
+        <div class="included-icon">&#128279;</div>
+        <div><h4 data-i18n="inc5_t">Kilométrage illimité</h4><p data-i18n="inc5_p">Roulez sans compter.</p></div>
+      </div>
+      <div class="included-item">
+        <div class="included-icon">&#128197;</div>
+        <div><h4 data-i18n="inc6_t">Annulation flexible</h4><p data-i18n="inc6_p">Jusqu'à 48h avant le départ.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ROUTES ================= -->
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow" data-i18n="routes_eyebrow">ITINÉRAIRES SUGGÉRÉS</p>
+        <h2 data-i18n="routes_title">Les routes qui donnent leur nom à Rent2Ride</h2>
+      </div>
+    </div>
+    <div class="routes-band">
+      <div class="route-card" style="--route-img:url('../images/route-ronda.jpg')">
+        <p class="km" data-i18n="route1_km">ROUTE A-397</p>
+        <h3 data-i18n="route1_t">Col de la Ronda</h3>
+        <p data-i18n="route1_p">180 virages entre San Pedro de Alcántara et Ronda.</p>
+      </div>
+      <div class="route-card" style="--route-img:url('../images/route-coast.jpg')">
+        <p class="km" data-i18n="route2_km">ROUTE N-340</p>
+        <h3 data-i18n="route2_t">Corniche de la Costa del Sol</h3>
+        <p data-i18n="route2_p">De Malaga à Marbella, une route côtière.</p>
+      </div>
+      <div class="route-card" style="--route-img:url('../images/route-villages.jpg')">
+        <p class="km" data-i18n="route3_km">ROUTE A-4050</p>
+        <h3 data-i18n="route3_t">Villages blancs</h3>
+        <p data-i18n="route3_p">Mijas, Coín et Monda en une journée.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CTA BAND ================= -->
+<section class="section section--dark text-center">
+  <div class="container-narrow">
+    <h2 style="font-family:var(--f-display); font-size:clamp(1.8rem,4vw,2.6rem); margin:0 0 12px;" data-i18n="cta_band_title">Prêt à prendre la route ?</h2>
+    <p style="color:rgba(255,255,255,.75); margin:0 0 28px;" data-i18n="cta_band_sub">Réservez en ligne en 2 minutes, sans engagement.</p>
+    <a href="reservation.html#booking" class="btn btn-primary btn-lg" data-i18n="cta_band_btn">Réserver maintenant</a>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer class="site-footer">
+  <div class="container">
+      <div class="newsletter-bar">
+        <div>
+          <h5 data-i18n="newsletter_t">Restez informé</h5>
+          <p data-i18n="newsletter_p">Bons plans, nouvelles routes, offres exclusives — pas de spam.</p>
+        </div>
+        <div>
+          <form class="newsletter-form">
+            <input type="email" required placeholder="Votre e-mail" data-i18n-placeholder="newsletter_ph">
+            <button type="submit" class="btn btn-primary" data-i18n="newsletter_btn">S'inscrire</button>
+            <p class="newsletter-success" data-i18n="newsletter_success">Merci ! Vous êtes inscrit.</p>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="footer-grid">
+      <div>
+        <div class="logo" style="margin-bottom:14px;">
+          <img src="./images/logo-signature.png" alt="Rent2Ride — Your Ride. Your Freedom." class="logo-full logo-full-white">
+        </div>
+        <p data-i18n="footer_about">Location de motos premium sur la Costa del Sol. Flotte Yamaha récente, assurance incluse, itinéraires sur-mesure.</p>
+        <div class="social-row">
+          <a href="https://www.instagram.com/rent2ride_es/" target="_blank" rel="noopener" aria-label="Instagram" class="social-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="2.5" width="19" height="19" rx="5"/><circle cx="12" cy="12" r="4.3"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg>
+          </a>
+          <a href="https://www.facebook.com/profile.php?id=61593356094044" aria-label="Facebook" class="social-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 21v-7.6h2.55l.38-2.96h-2.93V8.56c0-.86.24-1.44 1.47-1.44h1.57V4.47C16.2 4.4 15.3 4.32 14.25 4.32c-2.2 0-3.7 1.34-3.7 3.8v2.32H8v2.96h2.55V21h2.95Z"/></svg>
+          </a>
+          <a href="https://www.tiktok.com/@rent2ride.es" target="_blank" rel="noopener" aria-label="TikTok" class="social-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 5.82c-.7-.77-1.13-1.75-1.22-2.82h-3.1v13.9c0 1.6-1.3 2.9-2.9 2.9a2.9 2.9 0 0 1-2.9-2.9 2.9 2.9 0 0 1 2.9-2.9c.28 0 .55.04.8.11V10.9a6.02 6.02 0 0 0-.8-.05 6.06 6.06 0 0 0-6.06 6.06 6.06 6.06 0 0 0 6.06 6.06 6.06 6.06 0 0 0 6.06-6.06V9.5a9.16 9.16 0 0 0 4.99 1.47V7.86a5.87 5.87 0 0 1-3.83-2.04Z"/></svg>
+          </a>
+          <a href="https://www.youtube.com/channel/UCK-XuOTNfamnGl7gWwsM5Ww" target="_blank" rel="noopener" aria-label="YouTube" class="social-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8ZM9.6 15.5V8.5L15.8 12l-6.2 3.5Z"/></svg>
+          </a>
+        </div>
+      </div>
+      <div>
+        <h5 data-i18n="footer_nav_h">Navigation</h5>
+        <ul>
+          <li><a href="catalogue.html" data-i18n="nav_fleet">Catalogue motos</a></li>
+          <li><a href="boutique.html" data-i18n="nav_shop">Boutique</a></li>
+          <li><a href="offres.html" data-i18n="nav_packs">Nos offres</a></li>
+          <li><a href="reservation.html" data-i18n="nav_booking">Réservation</a></li>
+          <li><a href="balades.html" data-i18n="nav_rides">Balades</a></li>
+          <li><a href="galerie.html" data-i18n="nav_gallery">Galerie</a></li>
+          <li><a href="avis.html" data-i18n="nav_reviews">Avis clients</a></li>
+          <li><a href="faq.html" data-i18n="nav_faq">FAQ</a></li>
+          <li><a href="blog.html" data-i18n="nav_blog">Blog</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5 data-i18n="footer_legal_h">Informations légales</h5>
+        <ul>
+          <li><a href="assurance.html" data-i18n="nav_insurance">Assurance &amp; garanties</a></li>
+          <li><a href="conditions.html" data-i18n="footer_legal_terms">Conditions de location</a></li>
+          <li><a href="confidentialite.html" data-i18n="footer_legal_privacy">Confidentialité</a></li>
+          <li><a href="confidentialite.html#cookies" data-i18n="footer_legal_cookies">Cookies</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5 data-i18n="footer_contact_h">Contact</h5>
+        <ul>
+          <li>+33 6 88 13 38 95</li>
+          <li>info@rent2ride.com</li>
+          <li>Barcelone, Espagne</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 Rent2Ride. <span data-i18n="footer_rights">Tous droits réservés.</span></span>
+    </div>
+  </div>
+</footer>
+
+<!-- ================= WHATSAPP WIDGET ================= -->
+<div class="whatsapp-fab">
+  <div class="whatsapp-panel" id="whatsappPanel">
+    <div class="whatsapp-panel-head">
+      <div class="avatar"><img src="./images/logo-header.png" alt=""></div>
+      <div>
+        <strong data-i18n="wa_name">Rent2Ride</strong>
+        <span data-i18n="wa_status">Répond généralement en quelques minutes</span>
+      </div>
+    </div>
+    <div class="whatsapp-panel-body">
+      <div class="whatsapp-msg" data-i18n="wa_message">👋 Bonjour ! Une question ?</div>
+    </div>
+    <div class="whatsapp-panel-foot">
+      <a id="whatsappLink" href="#" target="_blank" rel="noopener" class="btn btn-block" style="background:#25D366; color:#fff;" data-i18n="wa_cta">Démarrer la discussion</a>
+    </div>
+  </div>
+  <button class="whatsapp-bubble" id="whatsappBubble" aria-label="WhatsApp">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.39 1.26 4.81L2 22l5.42-1.36c1.36.74 2.92 1.16 4.621.16h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2zm0 18.06h-.01c-1.5 0-2.97-.4-4.25-1.16l-.3-.18-3.16.79.84-3.08-.2-.32a8.07 8.07 0 0 1-1.24-4.3c0-4.49 3.65-8.14 8.14-8.14 2.17 0 4.21.85 5.75 2.39a8.07 8.07 0 0 1 2.38 5.75c0 4.49-3.65 8.14-8.14 8.14zm4.47-6.1c-.25-.12-1.45-.72-1.68-.8-.22-.08-.39-.12-.55.12-.16.25-.63.8-.77.96-.14.16-.28.18-.53.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.39-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.28.37-.42.12-.14.16-.25.25-.41.08-.16.04-.31-.02-.43-.06-.12-.55-1.32-.75-1.81-.2-.48-.4-.41-.55-.42h-.47c-.16 0-.43.06-.65.31-.22.25-.86.84-.86 2.04 0 1.2.88 2.37 1 2.53.12.16 1.73 2.64 4.19 3.7.58.25 1.04.4 1.4.51.59.19 1.12.16 1.55.1.47-.07 1.45-.59 1.65-1.16.2-.57.2-1.06.14-1.16-.06-.1-.22-.16-.47-.28z"/></svg>
+  </button>
 </div>
 
-<script>
-  /* =========================================================
-     TRADUCTION FR / ES / EN — page "Bientôt disponible"
-     ---------------------------------------------------------
-     Page autonome (pas de i18n.js chargé ici). Utilise la même
-     clé de stockage "cds_lang" que le reste du site : si le
-     visiteur a déjà choisi une langue ailleurs, elle est reprise
-     automatiquement ici, et inversement.
-     ========================================================= */
-  const SOON_TRANSLATIONS = {
-    title: {
-      fr: "Rent2Ride — Bientôt disponible",
-      es: "Rent2Ride — Próximamente",
-      en: "Rent2Ride — Coming soon"
-    },
-    description: {
-      fr: "Rent2Ride, location de motos sur la Costa del Sol. Le site arrive très bientôt.",
-      es: "Rent2Ride, alquiler de motos en la Costa del Sol. El sitio llega muy pronto.",
-      en: "Rent2Ride, motorcycle rental on the Costa del Sol. The site is launching very soon."
-    },
-    soon_eyebrow: {
-      fr: "Bientôt disponible",
-      es: "Próximamente",
-      en: "Coming soon"
-    },
-    soon_title: {
-      fr: "Le site arrive très prochainement",
-      es: "El sitio llega muy pronto",
-      en: "The site is launching very soon"
-    },
-    soon_text: {
-      fr: "Nous préparons votre expérience de location de motos sur la Costa del Sol. Une question en attendant ? Contactez-nous directement.",
-      es: "Estamos preparando su experiencia de alquiler de motos en la Costa del Sol. ¿Alguna pregunta mientras tanto? Contáctenos directamente.",
-      en: "We're preparing your motorcycle rental experience on the Costa del Sol. Got a question in the meantime? Contact us directly."
-    },
-    soon_momoven_text: {
-      fr: "En attendant, vous pouvez déjà louer notre moto sur",
-      es: "Mientras tanto, ya puede alquilar nuestra moto en",
-      en: "In the meantime, you can already rent our bike on"
-    },
-    soon_whatsapp_btn: {
-      fr: "Nous écrire sur WhatsApp",
-      es: "Escríbenos por WhatsApp",
-      en: "Message us on WhatsApp"
-    }
-  };
 
-  const SOON_LANGS = ["fr", "es", "en"];
-  const SOON_STORAGE_KEY = "cds_lang";
+<!-- ================= CART OVERLAY + DRAWER ================= -->
+<div class="cart-overlay" id="cartOverlay"></div>
+<aside class="cart-drawer" id="cartDrawer">
 
-  function getSoonLang(){
-    const stored = localStorage.getItem(SOON_STORAGE_KEY);
-    if (stored && SOON_LANGS.includes(stored)) return stored;
-    const nav = (navigator.language || "fr").slice(0,2);
-    return SOON_LANGS.includes(nav) ? nav : "fr";
-  }
+  <div class="cart-view" id="cartView">
+    <div class="cart-drawer-head">
+      <h3 data-i18n="cart_title">Votre panier</h3>
+      <button class="cart-drawer-close" id="cartClose" aria-label="Fermer">&times;</button>
+    </div>
 
-  function applySoonLang(lang){
-    document.getElementById("htmlRoot").lang = lang;
-    document.title = SOON_TRANSLATIONS.title[lang];
-    document.querySelector('meta[name="description"]').setAttribute("content", SOON_TRANSLATIONS.description[lang]);
-    document.querySelectorAll("[data-i18n]").forEach(el => {
-      const key = el.getAttribute("data-i18n");
-      if (SOON_TRANSLATIONS[key]) el.textContent = SOON_TRANSLATIONS[key][lang];
-    });
-    document.querySelectorAll("#soonLangSwitch button").forEach(btn => {
-      btn.classList.toggle("active", btn.dataset.lang === lang);
-    });
-    localStorage.setItem(SOON_STORAGE_KEY, lang);
-  }
+    <div class="cart-empty" id="cartEmpty">
+      <span style="font-size:2rem;">🛍️</span>
+      <p data-i18n="cart_empty">Votre panier est vide.</p>
+      <a href="boutique.html" class="btn btn-outline" data-i18n="cart_empty_cta">Voir la boutique</a>
+    </div>
 
-  document.querySelectorAll("#soonLangSwitch button").forEach(btn => {
-    btn.addEventListener("click", () => applySoonLang(btn.dataset.lang));
-  });
+    <div class="cart-items" id="cartItems"></div>
 
-  applySoonLang(getSoonLang());
-</script>
+    <div class="cart-drawer-footer" id="cartFooter" style="display:none;">
+      <div class="cart-total-row">
+        <span data-i18n="cart_subtotal">Sous-total</span>
+        <span id="cartTotal">0,00 €</span>
+      </div>
+      <p class="cart-shipping-note" data-i18n="cart_shipping_note">Frais de livraison calculés à la confirmation.</p>
+      <button class="btn btn-primary btn-block" id="cartCheckoutBtn" data-i18n="cart_checkout">Passer la commande</button>
+    </div>
+  </div>
+
+  <div class="checkout-view" id="checkoutView" style="display:none;">
+    <div class="cart-drawer-head">
+      <h3 data-i18n="checkout_title">Finaliser la commande</h3>
+      <button class="cart-drawer-close" id="cartClose2" aria-label="Fermer" onclick="closeCartDrawer()">&times;</button>
+    </div>
+    <div class="checkout-form">
+      <p class="checkout-payment-note" data-i18n="checkout_payment_note">Le paiement en ligne sécurisé arrive bientôt. Pour l'instant, on confirme votre commande et le règlement ensemble.</p>
+      <div class="checkout-error" id="checkoutError" data-i18n="checkout_required">Merci de renseigner au moins votre nom et un moyen de vous contacter (e-mail ou téléphone).</div>
+      <label><span data-i18n="checkout_name">Nom complet</span>
+        <input type="text" id="checkoutName" autocomplete="name" placeholder="Jean Dupont">
+      </label>
+      <label><span data-i18n="checkout_email">E-mail</span>
+        <input type="email" id="checkoutEmail" autocomplete="email" placeholder="jean.dupont@email.com">
+      </label>
+      <label><span data-i18n="checkout_phone">Téléphone</span>
+        <input type="tel" id="checkoutPhone" autocomplete="tel" placeholder="+33 6 12 34 56 78">
+      </label>
+      <label><span data-i18n="checkout_address">Adresse de livraison</span>
+        <input type="text" id="checkoutAddress" autocomplete="street-address" placeholder="12 rue de la Paix, 75002 Paris">
+      </label>
+      <label><span data-i18n="checkout_note">Note (optionnel)</span>
+        <textarea id="checkoutNote" data-i18n-placeholder="checkout_note_ph" placeholder="Précisions sur votre commande…"></textarea>
+      </label>
+    </div>
+    <div class="checkout-actions">
+      <button class="checkout-back" id="checkoutBackBtn" data-i18n="checkout_back_cart">Retour au panier</button>
+      <button class="btn btn-primary btn-block" id="checkoutSendBtn" data-i18n="checkout_send_both">Envoyer ma commande</button>
+    </div>
+  </div>
+
+</aside>
+
+<script src="./js/i18n.js"></script>
+<script src="./js/cookie-consent.js"></script>
+<script src="./js/main.js"></script>
 
 </body>
 </html>

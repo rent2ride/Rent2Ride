@@ -22,7 +22,7 @@ const TRANSLATIONS = {
   nav_blog:       { fr: "Blog",             es: "Blog",                en: "Blog" },
 
   /* ---------------- HERO (home) ---------------- */
-  hero_pill:      { fr: "★ 4,9/5 · +1200 locations", es: "★ 4,9/5 · +1200 alquileres", en: "★ 4.9/5 · 1,200+ rentals" },
+  hero_pill:      { fr: "🏍️ Flotte Yamaha récente", es: "🏍️ Flota Yamaha reciente", en: "🏍️ Recent Yamaha fleet" },
   hero_title:     { fr: "Louez votre moto et explorez la Costa del Sol",
                     es: "Alquile su moto y explore la Costa del Sol",
                     en: "Rent your bike and explore the Costa del Sol" },
@@ -41,8 +41,8 @@ const TRANSLATIONS = {
   trust2_s: { fr: "Gratuite jusqu'à 48h avant", es: "Gratis hasta 48h antes", en: "Free up to 48h before" },
   trust3_t: { fr: "Assistance 24/7", es: "Asistencia 24/7", en: "24/7 assistance" },
   trust3_s: { fr: "Sur toute l'Espagne", es: "En toda España", en: "Across Spain" },
-  trust4_t: { fr: "Note clients 4,9/5", es: "Valoración 4,9/5", en: "4.9/5 customer rating" },
-  trust4_s: { fr: "+1200 avis vérifiés", es: "+1200 opiniones verificadas", en: "1,200+ verified reviews" },
+  trust4_t: { fr: "Tarifs transparents", es: "Tarifas transparentes", en: "Transparent pricing" },
+  trust4_s: { fr: "Sans frais cachés", es: "Sin costes ocultos", en: "No hidden fees" },
 
   /* ---------------- FLEET PREVIEW / CATALOGUE ---------------- */
   fleet_eyebrow:  { fr: "NOTRE FLOTTE", es: "NUESTRA FLOTA", en: "OUR FLEET" },
