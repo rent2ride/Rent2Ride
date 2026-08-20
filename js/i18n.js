@@ -1089,4 +1089,46 @@ const TRANSLATIONS = {
   bpx_h5_p: { fr: "Comme pour tout séjour sur la Costa del Sol, les tarifs peuvent varier légèrement entre juillet-août et le reste de l'année. Réserver quelques semaines à l'avance en haute saison reste la meilleure façon de garantir la disponibilité du modèle souhaité au meilleur tarif.",
               es: "Como en cualquier estancia en la Costa del Sol, las tarifas pueden variar ligeramente entre julio-agosto y el resto del año. Reservar con unas semanas de antelación en temporada alta sigue siendo la mejor forma de garantizar la disponibilidad del modelo deseado al mejor precio.",
               en: "As with any stay on the Costa del Sol, rates can vary slightly between July-August and the rest of the year. Booking a few weeks ahead in high season is still the best way to guarantee availability of your preferred model at the best rate." }
+,
+  /* ---------------- FIDÉLITÉ — Rent2Ride Club (fidelite.html) ---------------- */
+  nav_loyalty: { fr: "Rent2Ride Club", es: "Rent2Ride Club", en: "Rent2Ride Club" },
+
+  title_fidelite: { fr: "Rent2Ride Club — Programme fidélité", es: "Rent2Ride Club — Programa de fidelidad", en: "Rent2Ride Club — Loyalty program" },
+
+  page_fidelite_title: { fr: "Rent2Ride Club", es: "Rent2Ride Club", en: "Rent2Ride Club" },
+  page_fidelite_sub: { fr: "Votre fidélité, récompensée sur la route.",
+                        es: "Su fidelidad, recompensada en la carretera.",
+                        en: "Your loyalty, rewarded on the road." },
+
+  fidelite_eyebrow: { fr: "RENT2RIDE CLUB", es: "RENT2RIDE CLUB", en: "RENT2RIDE CLUB" },
+  fidelite_intro: { fr: "Entrez l'email utilisé lors de vos réservations pour voir votre statut, votre progression et votre code de parrainage.",
+                     es: "Introduzca el email utilizado en sus reservas para ver su estado, su progreso y su código de referido.",
+                     en: "Enter the email used for your bookings to see your status, your progress and your referral code." },
+
+  fidelite_submit: { fr: "Voir mon statut", es: "Ver mi estado", en: "View my status" },
+  fidelite_hint: { fr: "Réservations effectuées via Momoven ou en direct — la réduction est appliquée manuellement lors de la confirmation de votre location.",
+                    es: "Reservas realizadas a través de Momoven o directamente — el descuento se aplica manualmente al confirmar su alquiler.",
+                    en: "Bookings made via Momoven or direct — the discount is applied manually when your rental is confirmed." },
+
+  fidelite_loading: { fr: "Recherche de votre profil…", es: "Buscando su perfil…", en: "Looking up your profile…" },
+  fidelite_error: { fr: "Aucun profil trouvé pour cet email. Si vous avez déjà loué avec nous, contactez-nous sur WhatsApp pour vérifier votre compte.",
+                     es: "No se ha encontrado ningún perfil para este email. Si ya ha alquilado con nosotros, contáctenos por WhatsApp para verificar su cuenta.",
+                     en: "No profile found for this email. If you've already rented with us, contact us on WhatsApp to check your account." },
+
+  fidelite_referral_h: { fr: "Parrainage", es: "Referidos", en: "Referral" },
+  fidelite_referral_p: { fr: "50 € de crédit pour vous et votre filleul, dès sa première location confirmée.",
+                          es: "50 € de crédito para usted y su referido, tras su primer alquiler confirmado.",
+                          en: "€50 credit for you and your referral, once their first rental is confirmed." },
+  fidelite_copy: { fr: "Copier", es: "Copiar", en: "Copy" },
+
+  fidelite_how_h: { fr: "Comment ça marche", es: "Cómo funciona", en: "How it works" },
+  fidelite_tier5: { fr: "locations = −5% permanent sur toutes vos futures réservations",
+                     es: "alquileres = −5% permanente en todas sus futuras reservas",
+                     en: "rentals = −5% permanent on all your future bookings" },
+  fidelite_tier10: { fr: "locations = −10% appliqué automatiquement à chaque réservation",
+                      es: "alquileres = −10% aplicado automáticamente en cada reserva",
+                      en: "rentals = −10% applied automatically to every booking" },
+  fidelite_tier20: { fr: "locations = −15% + statut VIP et accès prioritaire aux nouvelles motos",
+                      es: "alquileres = −15% + estado VIP y acceso prioritario a las motos nuevas",
+                      en: "rentals = −15% + VIP status and priority access to new bikes" }
 };
