@@ -1,24 +1,30 @@
-/* =========================================================
+/* ===============================================================
    RENT2RIDE — Proxy Bons Cadeaux (Cloudflare Worker)
-   ---------------------------------------------------------
+   ---------------------------------------------------------------
    Ce script sert d'intermédiaire sécurisé entre le site
    (rent2ride.github.io) et Airtable. Il ne révèle JAMAIS la
    clé Airtable au navigateur du client, et ne renvoie que le
    strict nécessaire (jamais les données d'un autre client).
 
-   DEUX ROUTES PUBLIQUES :
-   - POST /create   -> crée un bon cadeau après un achat, renvoie son code
-   - GET  /balance  -> consulte le solde d'UN SEUL code (celui demandé)
+   ROUTES PUBLIQUES :
+   - POST /create         -> crée un bon cadeau après un achat, renvoie son code
+   - GET  /balance         -> consulte le solde d'UN SEUL code (celui demandé)
+   - POST /validate-promo  -> valide un code promo côté serveur
+   - POST /loyalty-status  -> consulte le statut fidélité d'UN SEUL client (par email)
+   - POST /loyalty-checkin -> (usage interne Eloy, protégé par PIN) crée ou
+                              incrémente un client fidélité après une location
 
    CONFIGURATION REQUISE (Cloudflare Dashboard > Workers > ce Worker
    > Settings > Variables) :
-   - AIRTABLE_TOKEN   (secret)  : ton Personal Access Token Airtable
-   - AIRTABLE_BASE_ID (texte)   : commence par "app..."
-   - ALLOWED_ORIGIN   (texte)   : https://rent2ride.github.io
-   ========================================================= */
+   - AIRTABLE_TOKEN   (secret) : ton Personal Access Token Airtable
+   - AIRTABLE_BASE_ID (texte)  : commence par "app..."
+   - ALLOWED_ORIGIN   (texte)  : https://rent2ride.github.io
+   - STAFF_PIN        (secret) : code d'accès interne pour /loyalty-checkin
+   =============================================================== */
 
 const TABLE_GIFTCARDS = "GiftCards";
 const TABLE_PROMOCODES = "PromoCodes";
+const TABLE_LOYALTY = "Clients_Fidelite";
 
 function corsHeaders(env) {
   return {
@@ -134,7 +140,7 @@ async function handleBalance(request, env) {
     return jsonResponse({ error: "not_found" }, 404, env);
   }
 
-  // On ne renvoie QUE ce qui concerne ce code précis — jamais l'email,
+  // On ne renvoie QUE ce qui concerne ce code précis – jamais l'email,
   // le nom, ni aucune donnée des autres clients.
   return jsonResponse(
     {
@@ -147,14 +153,162 @@ async function handleBalance(request, env) {
   );
 }
 
-/* ---------------------------------------------------------
+/* --------------------------------------------------------------
+   STATUT FIDÉLITÉ (Rent2Ride Club) — lookup par email
+   --------------------------------------------------------------
+   Table Airtable "Clients_Fidelite" attendue avec les champs :
+   - Nom
+   - Email
+   - Nb_Locations
+   - Statut (formule)
+   - Reduction_Pct (formule)
+   - Code_Parrainage (formule)
+   - Credit_Parrainage_Disponible
+
+   Ne renvoie que les infos du client demandé (jamais la liste
+   complète), même logique que handleBalance pour les gift cards.
+   -------------------------------------------------------------- */
+async function handleLoyaltyStatus(request, env) {
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return jsonResponse({ error: "Corps de requête invalide." }, 400, env);
+  }
+
+  const email = (body.email || "").trim().toLowerCase();
+  if (!email) {
+    return jsonResponse({ found: false, error: "E-mail requis." }, 400, env);
+  }
+
+  const res = await airtableFetch(
+    env,
+    TABLE_LOYALTY,
+    `?filterByFormula=${encodeURIComponent(`LOWER({Email})="${email}"`)}`
+  );
+  const data = await res.json();
+  const record = (data.records || [])[0];
+
+  if (!record) {
+    return jsonResponse({ found: false }, 200, env);
+  }
+
+  const f = record.fields;
+
+  return jsonResponse(
+    {
+      found: true,
+      name: f.Nom || null,
+      nbLocations: Number(f.Nb_Locations || 0),
+      referralCode: f.Code_Parrainage || null,
+      referralCreditAvailable: Number(f.Credit_Parrainage_Disponible || 0),
+    },
+    200,
+    env
+  );
+}
+
+/* --------------------------------------------------------------
+   CHECK-IN FIDÉLITÉ (usage interne Eloy) — POST /loyalty-checkin
+   --------------------------------------------------------------
+   Route protégée par un code d'accès simple (STAFF_PIN, à ajouter
+   dans Settings > Variables and secrets du Worker, type "Secret").
+   Ce n'est PAS un vrai système d'authentification — juste un
+   filtre basique pour éviter qu'un lien trouvé par hasard permette
+   de modifier les données clients. Suffisant pour un usage interne
+   à 2 personnes, pas pour un vrai contrôle d'accès professionnel.
+
+   Comportement :
+   - Si le client (par email) existe déjà -> Nb_Locations += 1
+   - Si le client n'existe pas -> création avec Nb_Locations = 1
+   - Renvoie le statut à jour + les infos nécessaires pour générer
+     le message de remerciement côté page espace-eloy.html
+   -------------------------------------------------------------- */
+async function handleLoyaltyCheckin(request, env) {
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return jsonResponse({ error: "Corps de requête invalide." }, 400, env);
+  }
+
+  const pin = (body.pin || "").trim();
+  if (!env.STAFF_PIN || pin !== env.STAFF_PIN) {
+    return jsonResponse({ error: "Code d'accès incorrect." }, 401, env);
+  }
+
+  const email = (body.email || "").trim().toLowerCase();
+  const name = (body.name || "").trim();
+
+  if (!email) {
+    return jsonResponse({ error: "E-mail requis." }, 400, env);
+  }
+
+  const searchRes = await airtableFetch(
+    env,
+    TABLE_LOYALTY,
+    `?filterByFormula=${encodeURIComponent(`LOWER({Email})="${email}"`)}`
+  );
+  const searchData = await searchRes.json();
+  const existing = (searchData.records || [])[0];
+
+  let record;
+
+  if (existing) {
+    const currentCount = Number(existing.fields.Nb_Locations || 0);
+    const updateRes = await airtableFetch(env, TABLE_LOYALTY, `/${existing.id}`, {
+      method: "PATCH",
+      body: JSON.stringify({
+        fields: { Nb_Locations: currentCount + 1 },
+      }),
+    });
+    if (!updateRes.ok) {
+      const errText = await updateRes.text();
+      return jsonResponse({ error: "Erreur Airtable lors de la mise à jour.", detail: errText }, 502, env);
+    }
+    record = await updateRes.json();
+  } else {
+    const createRes = await airtableFetch(env, TABLE_LOYALTY, "", {
+      method: "POST",
+      body: JSON.stringify({
+        fields: {
+          Nom: name || email.split("@")[0],
+          Email: email,
+          Nb_Locations: 1,
+        },
+      }),
+    });
+    if (!createRes.ok) {
+      const errText = await createRes.text();
+      return jsonResponse({ error: "Erreur Airtable lors de la création.", detail: errText }, 502, env);
+    }
+    record = await createRes.json();
+  }
+
+  const f = record.fields;
+
+  return jsonResponse(
+    {
+      success: true,
+      name: f.Nom || null,
+      email: f.Email || email,
+      nbLocations: Number(f.Nb_Locations || 0),
+      referralCode: f.Code_Parrainage || null,
+      isNewClient: !existing,
+    },
+    200,
+    env
+  );
+}
+
+/* -----------------------------------------------------------
    VALIDATION CODE PROMO (côté serveur)
-   ---------------------------------------------------------
+   -----------------------------------------------------------
    Le code et son pourcentage ne sont JAMAIS visibles dans le
    code source du site (contrairement à l'ancien système en
    dur dans main.js). Chaque appel à cette route qui valide un
    code compte comme "une utilisation" et incrémente UsedCount
-   dans Airtable — même si le client ne va pas jusqu'au bout
+   dans Airtable – même si le client ne va pas jusqu'au bout
    de sa réservation. C'est un choix simple et volontaire :
    pas de suivi de commande complète côté site statique, donc
    on plafonne à la vérification plutôt qu'à la confirmation
@@ -162,20 +316,19 @@ async function handleBalance(request, env) {
    réel de trafic/abus observé.
 
    Table Airtable "PromoCodes" attendue avec les champs :
-     - Code            (texte, ex: "BIENVENUE10")
-     - DiscountPercent (nombre, ex: 10)
-     - MaxUses         (nombre, ex: 100 — vide/0 = illimité)
-     - UsedCount       (nombre, démarre à 0)
-     - Active          (case à cocher)
+   - Code            (texte, ex: "BIENVENUE10")
+   - DiscountPercent (nombre, ex: 10)
+   - MaxUses         (nombre, ex: 100 – vide/0 = illimité)
+   - UsedCount       (nombre, démarre à 0)
+   - Active          (case à cocher)
 
    Limite connue : deux requêtes simultanées sur le même code
    proche de sa limite pourraient toutes les deux passer avant
    que le compteur soit mis à jour (pas de verrou atomique côté
    Airtable via API REST standard). Risque faible vu le volume
    attendu d'un site de location de motos, mais à garder en tête.
-   --------------------------------------------------------- */
-  const TABLE_LOYALTY = "Clients_Fidelite";
-   async function handleValidatePromo(request, env) {
+   ----------------------------------------------------------- */
+async function handleValidatePromo(request, env) {
   let body;
   try {
     body = await request.json();
@@ -245,6 +398,9 @@ export default {
     }
     if (url.pathname === "/loyalty-status" && request.method === "POST") {
       return handleLoyaltyStatus(request, env);
+    }
+    if (url.pathname === "/loyalty-checkin" && request.method === "POST") {
+      return handleLoyaltyCheckin(request, env);
     }
 
     return jsonResponse({ error: "Route inconnue." }, 404, env);

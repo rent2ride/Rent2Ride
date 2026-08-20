@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Espace interne — Rent2Ride</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" href="./favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Inter', Arial, sans-serif;
+    background: #f4f2ee;
+    margin: 0;
+    padding: 32px 16px;
+    color: #222;
+  }
+  .wrap {
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 22px;
+    margin: 0 0 6px;
+  }
+  .sub {
+    color: #767676;
+    font-size: 14px;
+    margin: 0 0 28px;
+  }
+  .card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 24px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    margin-bottom: 20px;
+  }
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin: 16px 0 6px;
+  }
+  label:first-child { margin-top: 0; }
+  input, select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+  }
+  input:focus, select:focus {
+    outline: none;
+    border-color: #c9a24b;
+  }
+  button {
+    width: 100%;
+    background: #E0383A;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 20px;
+    font-family: inherit;
+  }
+  button:hover { opacity: 0.9; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .pin-lock {
+    text-align: center;
+  }
+  .pin-lock input {
+    text-align: center;
+    letter-spacing: 4px;
+    font-size: 20px;
+  }
+
+  #resultBox {
+    display: none;
+  }
+  #resultBox.show { display: block; }
+
+  .result-status {
+    background: #f0f8f0;
+    border: 1px solid #4a934a;
+    border-radius: 10px;
+    padding: 16px;
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+  .result-status.is-new {
+    background: #fff8ec;
+    border-color: #c9a24b;
+  }
+
+  .msg-preview {
+    background: #f7f6f3;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 13px;
+    white-space: pre-wrap;
+    line-height: 1.5;
+    margin-bottom: 12px;
+  }
+
+  .msg-actions {
+    display: flex;
+    gap: 10px;
+  }
+  .msg-actions button {
+    margin-top: 0;
+    font-size: 13px;
+    padding: 10px;
+  }
+  .btn-copy { background: #333; }
+  .btn-wa { background: #25D366; }
+
+  #errorBox {
+    display: none;
+    background: #fdeeec;
+    border: 1px solid #d9694f;
+    color: #a6402a;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 13px;
+    margin-top: 16px;
+  }
+  #errorBox.show { display: block; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <h1>Confirmer une location</h1>
+  <p class="sub">Espace interne — usage Eloy uniquement.</p>
+
+  <div class="card" id="pinCard">
+    <div class="pin-lock">
+      <label for="pinInput">Code d'accès</label>
+      <input type="password" id="pinInput" inputmode="numeric" placeholder="••••">
+      <button type="button" id="pinSubmit">Déverrouiller</button>
+    </div>
+  </div>
+
+  <div class="card" id="formCard" style="display:none;">
+    <label for="clientEmail">E-mail du client</label>
+    <input type="email" id="clientEmail" placeholder="client@email.com">
+
+    <label for="clientName">Prénom (si nouveau client seulement)</label>
+    <input type="text" id="clientName" placeholder="Marie">
+
+    <label for="clientPhone">Téléphone WhatsApp (optionnel)</label>
+    <input type="tel" id="clientPhone" placeholder="+33612345678">
+
+    <label for="clientLang">Langue du client</label>
+    <select id="clientLang">
+      <option value="fr">Français</option>
+      <option value="es">Español</option>
+      <option value="en">English</option>
+    </select>
+
+    <button type="button" id="checkinBtn">Confirmer la location</button>
+    <div id="errorBox"></div>
+  </div>
+
+  <div class="card" id="resultBox">
+    <div class="result-status" id="resultStatus"></div>
+    <label style="margin-top:0;">Message à envoyer</label>
+    <div class="msg-preview" id="msgPreview"></div>
+    <div class="msg-actions">
+      <button type="button" class="btn-copy" id="copyMsgBtn">Copier le message</button>
+      <button type="button" class="btn-wa" id="waBtn">Ouvrir WhatsApp</button>
+    </div>
+    <button type="button" id="resetBtn" style="background:#999; margin-top:10px;">Nouvelle location</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  const WORKER_URL = "https://rent2ride-giftcards.sch-eric-es.workers.dev/loyalty-checkin";
+  const PIN_STORAGE_KEY = "r2r_staff_pin";
+
+  const MESSAGES = {
+    fr: (link) => `Merci encore pour cette location avec Rent2Ride ! 🏍️\n\nOn espère que la balade vous a plu. Petit rappel : chaque location vous rapproche de nos réductions fidélité (jusqu'à -15% + statut VIP). Vous pouvez suivre votre statut et récupérer votre code de parrainage ici :\n👉 ${link}\n\nEt si vous connaissez quelqu'un qui aimerait rouler avec nous, le parrainage vous fait gagner 50€ à tous les deux dès sa première location !\n\nÀ bientôt sur la route 🙌`,
+    es: (link) => `¡Gracias de nuevo por este alquiler con Rent2Ride! 🏍️\n\nEsperamos que haya disfrutado del paseo. Un recordatorio: cada alquiler le acerca a nuestros descuentos de fidelidad (hasta -15% + estatus VIP). Puede consultar su estado y su código de referido aquí:\n👉 ${link}\n\nY si conoce a alguien a quien le gustaría rodar con nosotros, ¡el programa de referidos le hace ganar 50€ a ambos desde su primer alquiler!\n\nHasta pronto en la carretera 🙌`,
+    en: (link) => `Thanks again for renting with Rent2Ride! 🏍️\n\nHope you enjoyed the ride. Quick reminder: every rental gets you closer to our loyalty discounts (up to -15% + VIP status). You can check your status and grab your referral code here:\n👉 ${link}\n\nAnd if you know anyone who'd like to ride with us, referrals earn you both €50 from their first rental!\n\nSee you on the road soon 🙌`,
+  };
+
+  const LOYALTY_LINK = "https://rent2ride.github.io/Rent2Ride/fidelite.html";
+
+  const pinCard = document.getElementById("pinCard");
+  const formCard = document.getElementById("formCard");
+  const resultBox = document.getElementById("resultBox");
+  const errorBox = document.getElementById("errorBox");
+
+  let currentPin = localStorage.getItem(PIN_STORAGE_KEY) || "";
+
+  function unlock() {
+    pinCard.style.display = "none";
+    formCard.style.display = "block";
+  }
+
+  if (currentPin) unlock();
+
+  document.getElementById("pinSubmit").addEventListener("click", function () {
+    const val = document.getElementById("pinInput").value.trim();
+    if (!val) return;
+    currentPin = val;
+    localStorage.setItem(PIN_STORAGE_KEY, val);
+    unlock();
+  });
+
+  document.getElementById("checkinBtn").addEventListener("click", async function () {
+    const email = document.getElementById("clientEmail").value.trim();
+    const name = document.getElementById("clientName").value.trim();
+    const phone = document.getElementById("clientPhone").value.trim();
+    const lang = document.getElementById("clientLang").value;
+
+    errorBox.classList.remove("show");
+
+    if (!email) {
+      errorBox.textContent = "L'e-mail du client est requis.";
+      errorBox.classList.add("show");
+      return;
+    }
+
+    const btn = this;
+    btn.disabled = true;
+    btn.textContent = "…";
+
+    try {
+      const res = await fetch(WORKER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, name, pin: currentPin }),
+      });
+
+      if (res.status === 401) {
+        errorBox.textContent = "Code d'accès incorrect. Retapez-le.";
+        errorBox.classList.add("show");
+        localStorage.removeItem(PIN_STORAGE_KEY);
+        currentPin = "";
+        pinCard.style.display = "block";
+        formCard.style.display = "none";
+        return;
+      }
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        errorBox.textContent = data.error || "Une erreur est survenue.";
+        errorBox.classList.add("show");
+        return;
+      }
+
+      showResult(data, phone, lang);
+    } catch (err) {
+      errorBox.textContent = "Erreur réseau. Réessayez.";
+      errorBox.classList.add("show");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Confirmer la location";
+    }
+  });
+
+  function showResult(data, phone, lang) {
+    formCard.style.display = "none";
+    resultBox.classList.add("show");
+
+    const statusEl = document.getElementById("resultStatus");
+    statusEl.classList.toggle("is-new", data.isNewClient);
+    statusEl.innerHTML = data.isNewClient
+      ? `✨ Nouveau client créé — <strong>${escapeHtml(data.name)}</strong><br>1ère location enregistrée.`
+      : `✅ <strong>${escapeHtml(data.name)}</strong> mis à jour — <strong>${data.nbLocations} locations</strong> au total.`;
+
+    const message = MESSAGES[lang](LOYALTY_LINK);
+    document.getElementById("msgPreview").textContent = message;
+
+    document.getElementById("copyMsgBtn").onclick = function () {
+      navigator.clipboard.writeText(message).then(() => {
+        this.textContent = "Copié !";
+        setTimeout(() => { this.textContent = "Copier le message"; }, 1500);
+      });
+    };
+
+    const waBtn = document.getElementById("waBtn");
+    if (phone) {
+      const cleanPhone = phone.replace(/[^\d+]/g, "").replace("+", "");
+      waBtn.onclick = function () {
+        window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`, "_blank");
+      };
+      waBtn.style.display = "";
+    } else {
+      waBtn.style.display = "none";
+    }
+  }
+
+  document.getElementById("resetBtn").addEventListener("click", function () {
+    document.getElementById("clientEmail").value = "";
+    document.getElementById("clientName").value = "";
+    document.getElementById("clientPhone").value = "";
+    resultBox.classList.remove("show");
+    formCard.style.display = "block";
+  });
+
+  function escapeHtml(str) {
+    if (!str) return "";
+    return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+})();
+</script>
+
+</body>
+</html>
