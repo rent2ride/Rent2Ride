@@ -3,39 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rent2Ride Club — Programme fidélité</title>
+<title data-i18n="title_fidelite">Rent2Ride Club — Programme fidélité</title>
 <meta name="description" content="Suivez votre statut Rent2Ride Club, vos réductions fidélité et votre code de parrainage.">
+<link rel="canonical" href="https://rent2ride.github.io/Rent2Ride/fidelite.html">
+<meta property="og:title" content="Rent2Ride Club — Programme fidélité">
+<meta property="og:description" content="Suivez votre statut Rent2Ride Club, vos réductions fidélité et votre code de parrainage.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rent2ride.github.io/Rent2Ride/fidelite.html">
+<meta property="og:image" content="https://rent2ride.github.io/Rent2Ride/images/handover-malaga-airport.jpg">
+<meta property="og:locale" content="fr_FR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Rent2Ride Club — Programme fidélité">
+<meta name="twitter:description" content="Suivez votre statut Rent2Ride Club, vos réductions fidélité et votre code de parrainage.">
+<meta name="twitter:image" content="https://rent2ride.github.io/Rent2Ride/images/handover-malaga-airport.jpg">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#E0383A">
+<link rel="icon" type="image/png" href="./favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/base.css">
+<link rel="stylesheet" href="./css/components.css?v=2">
 
-<!-- ============================================================
-     INTEGRATION NOTE (à lire avant de coller dans le repo) :
-     1. Remplace ce <head> par ton head standard (favicon, css/main.css,
-        css/components.css, i18n.js, etc.) comme sur les autres pages.
-     2. Colle ton header/footer habituels (copié-collé comme les 25
-        autres pages) aux emplacements marqués <!-- HEADER --> et
-        <!-- FOOTER -->.
-     3. Remplace WORKER_URL plus bas par l'URL réelle de ton Worker
-        une fois la route /loyalty-status ajoutée (voir message Claude
-        pour le code du Worker).
-     ============================================================ -->
-
+<!--
+  NOTE POUR RICO :
+  - Le lien "Rent2Ride Club" a été ajouté dans la nav et le footer avec
+    data-i18n="nav_loyalty". Il faudra ajouter la clé "nav_loyalty" (FR/ES/EN)
+    dans js/i18n.js pour que la traduction fonctionne — en attendant, le texte
+    affiché reste "Rent2Ride Club" par défaut (identique dans les 3 langues,
+    donc pas bloquant, juste à harmoniser plus tard si besoin).
+  - Styles spécifiques à cette page ci-dessous, préfixés .loyalty- / .tier- /
+    .referral- pour ne rien écraser de components.css.
+-->
 <style>
   :root{
-    --r2r-black: #0b0b0d;
-    --r2r-charcoal: #17181c;
-    --r2r-gold: #c9a24b;
-    --r2r-gold-soft: rgba(201,162,75,0.15);
-    --r2r-white: #f5f3ee;
-    --r2r-grey: #9a9a9f;
-    --r2r-line: rgba(245,243,238,0.08);
-    --r2r-danger: #d9694f;
-  }
-
-  * { box-sizing: border-box; }
-
-  body.loyalty-page {
-    background: var(--r2r-black);
-    color: var(--r2r-white);
-    font-family: Arial, Helvetica, sans-serif;
+    --loy-gold: #c9a24b;
+    --loy-gold-soft: rgba(201,162,75,0.15);
+    --loy-line: rgba(0,0,0,0.08);
+    --loy-danger: #d9694f;
+    --loy-grey: #767676;
   }
 
   .loyalty-wrap {
@@ -48,19 +54,13 @@
     text-transform: uppercase;
     letter-spacing: 0.18em;
     font-size: 12px;
-    color: var(--r2r-gold);
+    color: var(--loy-gold);
     margin-bottom: 12px;
-  }
-
-  .loyalty-title {
-    font-size: clamp(32px, 5vw, 48px);
-    line-height: 1.05;
-    margin: 0 0 16px;
     font-weight: 700;
   }
 
   .loyalty-sub {
-    color: var(--r2r-grey);
+    color: var(--loy-grey);
     font-size: 16px;
     max-width: 560px;
     margin: 0 0 48px;
@@ -69,11 +69,12 @@
 
   /* ---- Lookup box ---- */
   .lookup-card {
-    background: var(--r2r-charcoal);
-    border: 1px solid var(--r2r-line);
+    background: #fff;
+    border: 1px solid var(--loy-line);
     border-radius: 14px;
     padding: 28px;
     margin-bottom: 56px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
   }
 
   .lookup-form {
@@ -84,22 +85,22 @@
 
   .lookup-form input[type="email"] {
     flex: 1 1 260px;
-    background: var(--r2r-black);
-    border: 1px solid var(--r2r-line);
+    background: #f7f6f3;
+    border: 1px solid var(--loy-line);
     border-radius: 8px;
     padding: 14px 16px;
-    color: var(--r2r-white);
     font-size: 15px;
+    font-family: inherit;
   }
 
   .lookup-form input[type="email"]:focus {
     outline: none;
-    border-color: var(--r2r-gold);
+    border-color: var(--loy-gold);
   }
 
   .lookup-form button {
-    background: var(--r2r-gold);
-    color: var(--r2r-black);
+    background: var(--loy-gold);
+    color: #fff;
     border: none;
     border-radius: 8px;
     padding: 14px 28px;
@@ -107,6 +108,7 @@
     font-size: 15px;
     cursor: pointer;
     transition: opacity 0.2s ease;
+    font-family: inherit;
   }
 
   .lookup-form button:hover { opacity: 0.85; }
@@ -115,7 +117,7 @@
   .lookup-hint {
     margin-top: 12px;
     font-size: 13px;
-    color: var(--r2r-grey);
+    color: var(--loy-grey);
   }
 
   /* ---- Result states ---- */
@@ -124,11 +126,12 @@
   #loyaltyLoading { display: none; }
 
   .loyalty-status-card {
-    background: var(--r2r-charcoal);
-    border: 1px solid var(--r2r-line);
+    background: #fff;
+    border: 1px solid var(--loy-line);
     border-radius: 14px;
     padding: 32px;
     margin-bottom: 32px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
   }
 
   .status-row {
@@ -150,14 +153,14 @@
     font-weight: 700;
     letter-spacing: 0.05em;
     text-transform: uppercase;
-    background: var(--r2r-gold-soft);
-    color: var(--r2r-gold);
-    border: 1px solid var(--r2r-gold);
+    background: var(--loy-gold-soft);
+    color: var(--loy-gold);
+    border: 1px solid var(--loy-gold);
   }
 
   .progress-track {
     height: 8px;
-    background: var(--r2r-black);
+    background: #f0eeea;
     border-radius: 999px;
     overflow: hidden;
     margin: 8px 0 10px;
@@ -165,7 +168,7 @@
 
   .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--r2r-gold), #e8c874);
+    background: linear-gradient(90deg, var(--loy-gold), #e8c874);
     border-radius: 999px;
     transition: width 0.6s ease;
     width: 0%;
@@ -173,7 +176,7 @@
 
   .progress-caption {
     font-size: 13px;
-    color: var(--r2r-grey);
+    color: var(--loy-grey);
   }
 
   .tiers-list {
@@ -184,7 +187,7 @@
   }
 
   .tier-item {
-    border: 1px solid var(--r2r-line);
+    border: 1px solid var(--loy-line);
     border-radius: 10px;
     padding: 14px 12px;
     text-align: center;
@@ -192,23 +195,24 @@
   }
 
   .tier-item.tier-reached {
-    border-color: var(--r2r-gold);
-    background: var(--r2r-gold-soft);
+    border-color: var(--loy-gold);
+    background: var(--loy-gold-soft);
   }
 
   .tier-item .tier-pct {
     display: block;
     font-size: 18px;
     font-weight: 700;
-    color: var(--r2r-gold);
+    color: var(--loy-gold);
     margin-bottom: 4px;
   }
 
   .referral-card {
-    background: var(--r2r-charcoal);
-    border: 1px solid var(--r2r-line);
+    background: #fff;
+    border: 1px solid var(--loy-line);
     border-radius: 14px;
     padding: 32px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
   }
 
   .referral-card h3 {
@@ -217,7 +221,7 @@
   }
 
   .referral-card p {
-    color: var(--r2r-grey);
+    color: var(--loy-grey);
     font-size: 14px;
     line-height: 1.6;
     margin: 0 0 20px;
@@ -227,8 +231,8 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    background: var(--r2r-black);
-    border: 1px dashed var(--r2r-gold);
+    background: #f7f6f3;
+    border: 1px dashed var(--loy-gold);
     border-radius: 8px;
     padding: 14px 18px;
   }
@@ -237,21 +241,23 @@
     font-size: 18px;
     font-weight: 700;
     letter-spacing: 0.08em;
-    color: var(--r2r-gold);
+    color: var(--loy-gold);
     flex: 1;
   }
 
   .referral-code-box button {
     background: transparent;
-    border: 1px solid var(--r2r-line);
-    color: var(--r2r-white);
+    border: 1px solid var(--loy-line);
     padding: 8px 14px;
     border-radius: 6px;
     font-size: 12px;
     cursor: pointer;
+    font-family: inherit;
   }
 
-  .referral-code-box button:hover { border-color: var(--r2r-gold); }
+  .referral-code-box button:hover { border-color: var(--loy-gold); }
+
+  #rReferralCredit { margin-top: 14px; margin-bottom: 0; font-size: 13px; color: var(--loy-grey); }
 
   /* ---- Error / loading ---- */
   .loyalty-msg {
@@ -262,19 +268,19 @@
   }
 
   #loyaltyError {
-    background: rgba(217,105,79,0.1);
-    border: 1px solid var(--r2r-danger);
-    color: #f0b9ab;
+    background: rgba(217,105,79,0.08);
+    border: 1px solid var(--loy-danger);
+    color: #a6402a;
   }
 
   #loyaltyLoading {
-    color: var(--r2r-grey);
+    color: var(--loy-grey);
   }
 
   /* ---- Static tiers explainer (always visible) ---- */
   .tiers-explainer {
     margin-top: 64px;
-    border-top: 1px solid var(--r2r-line);
+    border-top: 1px solid var(--loy-line);
     padding-top: 40px;
   }
 
@@ -290,13 +296,14 @@
   }
 
   .explainer-item {
-    border: 1px solid var(--r2r-line);
+    border: 1px solid var(--loy-line);
     border-radius: 12px;
     padding: 20px;
+    background: #fff;
   }
 
   .explainer-item .num {
-    color: var(--r2r-gold);
+    color: var(--loy-gold);
     font-size: 24px;
     font-weight: 700;
     display: block;
@@ -305,7 +312,7 @@
 
   .explainer-item .desc {
     font-size: 13px;
-    color: var(--r2r-grey);
+    color: var(--loy-grey);
     line-height: 1.5;
   }
 
@@ -316,15 +323,55 @@
   }
 </style>
 </head>
-<body class="loyalty-page">
+<body>
 
-<!-- HEADER -->
+<header class="site-header">
+  <nav class="nav">
+    <a href="index.html" class="logo">
+      <img src="./images/logo-signature.png" alt="Rent2Ride — Your Ride. Your Freedom." class="logo-full">
+    </a>
+    <button class="burger" aria-label="Menu" aria-expanded="false">&#9776;</button>
+    <div class="nav-links">
+      <a href="index.html" data-i18n="nav_home">Accueil</a>
+      <a href="catalogue.html" data-i18n="nav_fleet">Catalogue motos</a>
+      <a href="offres.html" data-i18n="nav_packs">Nos offres</a>
+      <a href="reservation.html" data-i18n="nav_booking">Réservation</a>
+      <a href="balades.html" data-i18n="nav_rides">Balades</a>
+      <a href="galerie.html" data-i18n="nav_gallery">Galerie</a>
+      <a href="avis.html" data-i18n="nav_reviews">Avis clients</a>
+      <a href="faq.html" data-i18n="nav_faq">FAQ</a>
+      <a href="blog.html" data-i18n="nav_blog">Blog</a>
+      <a href="contact.html" data-i18n="nav_contact">Contact</a>
+      <a href="boutique.html" data-i18n="nav_shop">Boutique</a>
+      <a href="fidelite.html" class="active" data-i18n="nav_loyalty">Rent2Ride Club</a>
+      <a href="reservation.html#booking" class="btn btn-primary nav-cta" data-i18n="nav_book">Réserver</a>
+    </div>
+    <div class="nav-right">
+      <div class="lang-switch">
+        <button data-lang="fr">FR</button>
+        <button data-lang="es">ES</button>
+        <button data-lang="en">EN</button>
+      </div>
+      <button class="cart-toggle" aria-label="Panier" title="Panier">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.5 3h2l2.6 12.4a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 2-1.6L21 7H6"/></svg>
+        <span class="cart-badge">0</span>
+      </button>
+      <a href="reservation.html#booking" class="btn btn-primary" data-i18n="nav_book">Réserver</a>
+    </div>
+  </nav>
+</header>
+
+<section class="page-hero" style="--hero-img:url('../images/handover-malaga-airport.jpg')">
+  <div class="container">
+    <h1 data-i18n="page_fidelite_title">Rent2Ride Club</h1>
+    <p data-i18n="page_fidelite_sub">Votre fidélité, récompensée sur la route.</p>
+  </div>
+</section>
 
 <main class="loyalty-wrap">
 
-  <div class="loyalty-eyebrow">RENT2RIDE CLUB</div>
-  <h1 class="loyalty-title">Votre fidélité,<br>récompensée sur la route.</h1>
-  <p class="loyalty-sub">
+  <div class="loyalty-eyebrow" data-i18n="fidelite_eyebrow">RENT2RIDE CLUB</div>
+  <p class="loyalty-sub" data-i18n="fidelite_intro">
     Entrez l'email utilisé lors de vos réservations pour voir votre statut,
     votre progression et votre code de parrainage.
   </p>
@@ -332,17 +379,17 @@
   <div class="lookup-card">
     <form class="lookup-form" id="loyaltyForm">
       <input type="email" id="loyaltyEmail" placeholder="votre@email.com" required autocomplete="email">
-      <button type="submit" id="loyaltySubmit">Voir mon statut</button>
+      <button type="submit" id="loyaltySubmit" data-i18n="fidelite_submit">Voir mon statut</button>
     </form>
-    <p class="lookup-hint">
+    <p class="lookup-hint" data-i18n="fidelite_hint">
       Réservations effectuées via Momoven ou en direct — la réduction est appliquée
       manuellement lors de la confirmation de votre location.
     </p>
   </div>
 
-  <div id="loyaltyLoading" class="loyalty-msg">Recherche de votre profil…</div>
+  <div id="loyaltyLoading" class="loyalty-msg" data-i18n="fidelite_loading">Recherche de votre profil…</div>
 
-  <div id="loyaltyError" class="loyalty-msg">
+  <div id="loyaltyError" class="loyalty-msg" data-i18n="fidelite_error">
     Aucun profil trouvé pour cet email. Si vous avez déjà loué avec nous,
     contactez-nous sur WhatsApp pour vérifier votre compte.
   </div>
@@ -376,41 +423,198 @@
     </div>
 
     <div class="referral-card">
-      <h3>Parrainage</h3>
-      <p>50 € de crédit pour vous et votre filleul, dès sa première location confirmée.</p>
+      <h3 data-i18n="fidelite_referral_h">Parrainage</h3>
+      <p data-i18n="fidelite_referral_p">50 € de crédit pour vous et votre filleul, dès sa première location confirmée.</p>
       <div class="referral-code-box">
         <code id="rReferralCode">—</code>
-        <button type="button" id="rCopyBtn">Copier</button>
+        <button type="button" id="rCopyBtn" data-i18n="fidelite_copy">Copier</button>
       </div>
+      <p id="rReferralCredit"></p>
     </div>
   </div>
 
   <div class="tiers-explainer">
-    <h2>Comment ça marche</h2>
+    <h2 data-i18n="fidelite_how_h">Comment ça marche</h2>
     <div class="explainer-grid">
       <div class="explainer-item">
         <span class="num">5</span>
-        <div class="desc">locations = −5% permanent sur toutes vos futures réservations</div>
+        <div class="desc" data-i18n="fidelite_tier5">locations = −5% permanent sur toutes vos futures réservations</div>
       </div>
       <div class="explainer-item">
         <span class="num">10</span>
-        <div class="desc">locations = −10% appliqué automatiquement à chaque réservation</div>
+        <div class="desc" data-i18n="fidelite_tier10">locations = −10% appliqué automatiquement à chaque réservation</div>
       </div>
       <div class="explainer-item">
         <span class="num">20</span>
-        <div class="desc">locations = −15% + statut VIP et accès prioritaire aux nouvelles motos</div>
+        <div class="desc" data-i18n="fidelite_tier20">locations = −15% + statut VIP et accès prioritaire aux nouvelles motos</div>
       </div>
     </div>
   </div>
 
 </main>
 
-<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="container">
+      <div class="newsletter-bar">
+        <div>
+          <h5 data-i18n="newsletter_t">Restez informé</h5>
+          <p data-i18n="newsletter_p">Bons plans, nouvelles routes, offres exclusives — pas de spam.</p>
+        </div>
+        <div>
+          <form class="newsletter-form">
+            <input type="email" required placeholder="Votre e-mail" data-i18n-placeholder="newsletter_ph">
+            <button type="submit" class="btn btn-primary" data-i18n="newsletter_btn">S'inscrire</button>
+            <p class="newsletter-success" data-i18n="newsletter_success">Merci ! Vous êtes inscrit.</p>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="footer-grid">
+      <div>
+        <div class="logo" style="margin-bottom:14px;">
+          <img src="./images/logo-signature.png" alt="Rent2Ride — Your Ride. Your Freedom." class="logo-full logo-full-white">
+        </div>
+        <p data-i18n="footer_about">Location de motos premium sur la Costa del Sol. Flotte Yamaha récente, assurance incluse, itinéraires sur-mesure.</p>
+        <div class="social-row">
+          <a href="https://www.instagram.com/rent2ride_es/" target="_blank" rel="noopener" aria-label="Instagram" class="social-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="2.5" width="19" height="19" rx="5"/><circle cx="12" cy="12" r="4.3"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg>
+          </a>
+          <a href="https://www.facebook.com/profile.php?id=61593356094044" aria-label="Facebook" class="social-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 21v-7.6h2.55l.38-2.96h-2.93V8.56c0-.86.24-1.44 1.47-1.44h1.57V4.47C16.2 4.4 15.3 4.32 14.25 4.32c-2.2 0-3.7 1.34-3.7 3.8v2.32H8v2.96h2.55V21h2.95Z"/></svg>
+          </a>
+          <a href="https://www.tiktok.com/@rent2ride.es" target="_blank" rel="noopener" aria-label="TikTok" class="social-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 5.82c-.7-.77-1.13-1.75-1.22-2.82h-3.1v13.9c0 1.6-1.3 2.9-2.9 2.9a2.9 2.9 0 0 1-2.9-2.9 2.9 2.9 0 0 1 2.9-2.9c.28 0 .55.04.8.11V10.9a6.02 6.02 0 0 0-.8-.05 6.06 6.06 0 0 0-6.06 6.06 6.06 6.06 0 0 0 6.06 6.06 6.06 6.06 0 0 0 6.06-6.06V9.5a9.16 9.16 0 0 0 4.99 1.47V7.86a5.87 5.87 0 0 1-3.83-2.04Z"/></svg>
+          </a>
+          <a href="https://www.youtube.com/channel/UCK-XuOTNfamnGl7gWwsM5Ww" target="_blank" rel="noopener" aria-label="YouTube" class="social-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8ZM9.6 15.5V8.5L15.8 12l-6.2 3.5Z"/></svg>
+          </a>
+        </div>
+      </div>
+      <div>
+        <h5 data-i18n="footer_nav_h">Navigation</h5>
+        <ul>
+          <li><a href="catalogue.html" data-i18n="nav_fleet">Catalogue motos</a></li>
+          <li><a href="boutique.html" data-i18n="nav_shop">Boutique</a></li>
+          <li><a href="offres.html" data-i18n="nav_packs">Nos offres</a></li>
+          <li><a href="reservation.html" data-i18n="nav_booking">Réservation</a></li>
+          <li><a href="fidelite.html" data-i18n="nav_loyalty">Rent2Ride Club</a></li>
+          <li><a href="balades.html" data-i18n="nav_rides">Balades</a></li>
+          <li><a href="galerie.html" data-i18n="nav_gallery">Galerie</a></li>
+          <li><a href="avis.html" data-i18n="nav_reviews">Avis clients</a></li>
+          <li><a href="faq.html" data-i18n="nav_faq">FAQ</a></li>
+          <li><a href="blog.html" data-i18n="nav_blog">Blog</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5 data-i18n="footer_legal_h">Informations légales</h5>
+        <ul>
+          <li><a href="assurance.html" data-i18n="nav_insurance">Assurance &amp; garanties</a></li>
+          <li><a href="conditions.html" data-i18n="footer_legal_terms">Conditions de location</a></li>
+          <li><a href="confidentialite.html" data-i18n="footer_legal_privacy">Confidentialité</a></li>
+          <li><a href="confidentialite.html#cookies" data-i18n="footer_legal_cookies">Cookies</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5 data-i18n="footer_contact_h">Contact</h5>
+        <ul>
+          <li>+33 6 88 13 38 95</li>
+          <li>info@rent2ride.com</li>
+          <li>Barcelone, Espagne</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 Rent2Ride. <span data-i18n="footer_rights">Tous droits réservés.</span></span>
+    </div>
+  </div>
+</footer>
 
+<div class="whatsapp-fab">
+  <div class="whatsapp-panel" id="whatsappPanel">
+    <div class="whatsapp-panel-head">
+      <div class="avatar"><img src="./images/logo-header.png" alt=""></div>
+      <div>
+        <strong data-i18n="wa_name">Rent2Ride</strong>
+        <span data-i18n="wa_status">Répond généralement en quelques minutes</span>
+      </div>
+    </div>
+    <div class="whatsapp-panel-body">
+      <div class="whatsapp-msg" data-i18n="wa_message">👋 Bonjour ! Une question ?</div>
+    </div>
+    <div class="whatsapp-panel-foot">
+      <a id="whatsappLink" href="#" target="_blank" rel="noopener" class="btn btn-block" style="background:#25D366; color:#fff;" data-i18n="wa_cta">Démarrer la discussion</a>
+    </div>
+  </div>
+  <button class="whatsapp-bubble" id="whatsappBubble" aria-label="WhatsApp">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.39 1.26 4.81L2 22l5.42-1.36c1.36.74 2.92 1.16 4.621.16h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2zm0 18.06h-.01c-1.5 0-2.97-.4-4.25-1.16l-.3-.18-3.16.79.84-3.08-.2-.32a8.07 8.07 0 0 1-1.24-4.3c0-4.49 3.65-8.14 8.14-8.14 2.17 0 4.21.85 5.75 2.39a8.07 8.07 0 0 1 2.38 5.75c0 4.49-3.65 8.14-8.14 8.14zm4.47-6.1c-.25-.12-1.45-.72-1.68-.8-.22-.08-.39-.12-.55.12-.16.25-.63.8-.77.96-.14.16-.28.18-.53.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.39-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.28.37-.42.12-.14.16-.25.25-.41.08-.16.04-.31-.02-.43-.06-.12-.55-1.32-.75-1.81-.2-.48-.4-.41-.55-.42h-.47c-.16 0-.43.06-.65.31-.22.25-.86.84-.86 2.04 0 1.2.88 2.37 1 2.53.12.16 1.73 2.64 4.19 3.7.58.25 1.04.4 1.4.51.59.19 1.12.16 1.55.1.47-.07 1.45-.59 1.65-1.16.2-.57.2-1.06.14-1.16-.06-.1-.22-.16-.47-.28z"/></svg>
+  </button>
+</div>
+
+<!-- ================= CART OVERLAY + DRAWER ================= -->
+<div class="cart-overlay" id="cartOverlay"></div>
+<aside class="cart-drawer" id="cartDrawer">
+
+  <div class="cart-view" id="cartView">
+    <div class="cart-drawer-head">
+      <h3 data-i18n="cart_title">Votre panier</h3>
+      <button class="cart-drawer-close" id="cartClose" aria-label="Fermer">&times;</button>
+    </div>
+
+    <div class="cart-empty" id="cartEmpty">
+      <span style="font-size:2rem;">🛍️</span>
+      <p data-i18n="cart_empty">Votre panier est vide.</p>
+      <a href="boutique.html" class="btn btn-outline" data-i18n="cart_empty_cta">Voir la boutique</a>
+    </div>
+
+    <div class="cart-items" id="cartItems"></div>
+
+    <div class="cart-drawer-footer" id="cartFooter" style="display:none;">
+      <div class="cart-total-row">
+        <span data-i18n="cart_subtotal">Sous-total</span>
+        <span id="cartTotal">0,00 €</span>
+      </div>
+      <p class="cart-shipping-note" data-i18n="cart_shipping_note">Frais de livraison calculés à la confirmation.</p>
+      <button class="btn btn-primary btn-block" id="cartCheckoutBtn" data-i18n="cart_checkout">Passer la commande</button>
+    </div>
+  </div>
+
+  <div class="checkout-view" id="checkoutView" style="display:none;">
+    <div class="cart-drawer-head">
+      <h3 data-i18n="checkout_title">Finaliser la commande</h3>
+      <button class="cart-drawer-close" id="cartClose2" aria-label="Fermer" onclick="closeCartDrawer()">&times;</button>
+    </div>
+    <div class="checkout-form">
+      <p class="checkout-payment-note" data-i18n="checkout_payment_note">Le paiement en ligne sécurisé arrive bientôt. Pour l'instant, on confirme votre commande et le règlement ensemble.</p>
+      <div class="checkout-error" id="checkoutError" data-i18n="checkout_required">Merci de renseigner au moins votre nom et un moyen de vous contacter (e-mail ou téléphone).</div>
+      <label><span data-i18n="checkout_name">Nom complet</span>
+        <input type="text" id="checkoutName" autocomplete="name" placeholder="Jean Dupont">
+      </label>
+      <label><span data-i18n="checkout_email">E-mail</span>
+        <input type="email" id="checkoutEmail" autocomplete="email" placeholder="jean.dupont@email.com">
+      </label>
+      <label><span data-i18n="checkout_phone">Téléphone</span>
+        <input type="tel" id="checkoutPhone" autocomplete="tel" placeholder="+33 6 12 34 56 78">
+      </label>
+      <label><span data-i18n="checkout_address">Adresse de livraison</span>
+        <input type="text" id="checkoutAddress" autocomplete="street-address" placeholder="12 rue de la Paix, 75002 Paris">
+      </label>
+      <label><span data-i18n="checkout_note">Note (optionnel)</span>
+        <textarea id="checkoutNote" data-i18n-placeholder="checkout_note_ph" placeholder="Précisions sur votre commande…"></textarea>
+      </label>
+    </div>
+    <div class="checkout-actions">
+      <button class="checkout-back" id="checkoutBackBtn" data-i18n="checkout_back_cart">Retour au panier</button>
+      <button class="btn btn-primary btn-block" id="checkoutSendBtn" data-i18n="checkout_send_both">Envoyer ma commande</button>
+    </div>
+  </div>
+
+</aside>
+
+<script src="./js/i18n.js"></script>
+<script src="./js/cookie-consent.js"></script>
+<script src="./js/main.js"></script>
 <script>
 (function () {
-  // TODO: remplacer par l'URL réelle une fois la route /loyalty-status
-  // ajoutée à ton Worker Cloudflare existant (rent2ride-giftcards ou nouveau).
   const WORKER_URL = "https://rent2ride-giftcards.sch-eric-es.workers.dev/loyalty-status";
 
   const form = document.getElementById("loyaltyForm");
@@ -441,12 +645,10 @@
     for (const t of TIER_THRESHOLDS) {
       if (n < t) return t;
     }
-    return null; // already at max tier
+    return null;
   }
 
   function renderResult(data) {
-    // Expected shape from Worker:
-    // { name, nbLocations, referralCode }
     const n = Number(data.nbLocations || 0);
     const tier = currentTier(n);
     const next = nextThreshold(n);
@@ -473,6 +675,10 @@
     });
 
     document.getElementById("rReferralCode").textContent = data.referralCode || "Disponible après votre 1ère location";
+
+    const credit = Number(data.referralCreditAvailable || 0);
+    const creditEl = document.getElementById("rReferralCredit");
+    creditEl.textContent = credit > 0 ? `Crédit disponible : ${credit} €` : "";
 
     resultEl.style.display = "block";
   }
@@ -527,6 +733,5 @@
   });
 })();
 </script>
-
 </body>
 </html>
