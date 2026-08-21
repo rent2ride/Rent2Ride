@@ -116,7 +116,7 @@ let appliedPromoCode = null;
 
 /* WhatsApp business number, international format, no spaces or symbols.
    Example shown is a PLACEHOLDER — replace with your real number. */
-const WHATSAPP_NUMBER = "33688133895";
+const WHATSAPP_NUMBER = "34649115400";
 
 /* =========================================================
    NOTIFICATION AUTOMATIQUE — RÉSERVATIONS & COMMANDES BOUTIQUE
