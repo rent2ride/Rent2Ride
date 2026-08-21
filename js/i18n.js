@@ -1131,4 +1131,25 @@ const TRANSLATIONS = {
   fidelite_tier20: { fr: "locations = −15% + statut VIP et accès prioritaire aux nouvelles motos",
                       es: "alquileres = −15% + estado VIP y acceso prioritario a las motos nuevas",
                       en: "rentals = −15% + VIP status and priority access to new bikes" }
+,
+  fidelite_notfound_p: { fr: "Aucun profil trouvé pour cet email. Si vous avez déjà loué avec nous, contactez-nous sur WhatsApp pour vérifier votre compte.",
+                          es: "No se ha encontrado ningún perfil para este email. Si ya ha alquilado con nosotros, contáctenos por WhatsApp para verificar su cuenta.",
+                          en: "No profile found for this email. If you've already rented with us, contact us on WhatsApp to check your account." },
+  fidelite_notfound_signup_p: { fr: "Vous n'avez encore jamais loué chez nous ? Vous pouvez déjà rejoindre le Rent2Ride Club — vos futures locations compteront automatiquement.",
+                                 es: "¿Todavía no ha alquilado con nosotros? Ya puede unirse al Rent2Ride Club — sus futuros alquileres contarán automáticamente.",
+                                 en: "Haven't rented with us yet? You can already join the Rent2Ride Club — your future rentals will count automatically." },
+  fidelite_signup_btn: { fr: "Rejoindre le Rent2Ride Club", es: "Unirse al Rent2Ride Club", en: "Join the Rent2Ride Club" },
+  fidelite_signup_success: { fr: "Bienvenue dans le Rent2Ride Club ! Votre profil est créé. Vos futures locations compteront automatiquement vers vos réductions fidélité.",
+                              es: "¡Bienvenido al Rent2Ride Club! Su perfil ha sido creado. Sus futuros alquileres contarán automáticamente para sus descuentos de fidelidad.",
+                              en: "Welcome to the Rent2Ride Club! Your profile has been created. Your future rentals will automatically count toward your loyalty discounts." },
+
+  /* ---------------- Section Rent2Ride Club sur la page d'accueil (site-complet.html) ---------------- */
+  home_loyalty_eyebrow: { fr: "RENT2RIDE CLUB", es: "RENT2RIDE CLUB", en: "RENT2RIDE CLUB" },
+  home_loyalty_title: { fr: "Plus vous roulez, plus vous économisez",
+                         es: "Cuanto más rueda, más ahorra",
+                         en: "The more you ride, the more you save" },
+  home_loyalty_sub: { fr: "Rejoignez le Rent2Ride Club dès maintenant : jusqu'à −15% de réduction, statut VIP, et 50 € offerts par filleul parrainé.",
+                       es: "Únase al Rent2Ride Club ahora: hasta −15% de descuento, estatus VIP y 50 € por cada referido.",
+                       en: "Join the Rent2Ride Club now: up to −15% off, VIP status, and €50 for every referral." },
+  home_loyalty_cta: { fr: "Rejoindre le Club", es: "Unirse al Club", en: "Join the Club" }
 };

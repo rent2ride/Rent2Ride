@@ -11,6 +11,9 @@
    - GET  /balance         -> consulte le solde d'UN SEUL code (celui demandé)
    - POST /validate-promo  -> valide un code promo côté serveur
    - POST /loyalty-status  -> consulte le statut fidélité d'UN SEUL client (par email)
+   - POST /loyalty-signup  -> auto-inscription publique, crée un client à
+                              Nb_Locations = 0 (aucune réduction tant qu'il
+                              n'a pas réellement loué — voir /loyalty-checkin)
    - POST /loyalty-checkin -> (usage interne Eloy, protégé par PIN) crée ou
                               incrémente un client fidélité après une location
 
@@ -20,6 +23,13 @@
    - AIRTABLE_BASE_ID (texte)  : commence par "app..."
    - ALLOWED_ORIGIN   (texte)  : https://rent2ride.github.io
    - STAFF_PIN        (secret) : code d'accès interne pour /loyalty-checkin
+
+   LIMITE CONNUE SUR /loyalty-signup :
+   Cette route est publique et n'a aucune protection anti-spam/anti-bot
+   au-delà d'une validation basique du format email. Un Worker Cloudflare
+   seul (sans KV/Durable Objects) ne permet pas facilement de limiter le
+   nombre de requêtes par IP. Risque faible vu le volume attendu, mais à
+   surveiller si le site reçoit du trafic non désiré sur cette route.
    =============================================================== */
 
 const TABLE_GIFTCARDS = "GiftCards";
@@ -39,6 +49,10 @@ function jsonResponse(data, status, env) {
     status,
     headers: { "Content-Type": "application/json", ...corsHeaders(env) },
   });
+}
+
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 /* Génère un code lisible, du style R2R-4K9X2 */
@@ -202,6 +216,93 @@ async function handleLoyaltyStatus(request, env) {
       nbLocations: Number(f.Nb_Locations || 0),
       referralCode: f.Code_Parrainage || null,
       referralCreditAvailable: Number(f.Credit_Parrainage_Disponible || 0),
+    },
+    200,
+    env
+  );
+}
+
+/* --------------------------------------------------------------
+   AUTO-INSCRIPTION PUBLIQUE — POST /loyalty-signup
+   --------------------------------------------------------------
+   Route publique, accessible à n'importe quel visiteur depuis
+   fidelite.html. Crée une fiche client à Nb_Locations = 0 : le
+   client apparaît dans le programme mais n'a AUCUNE réduction et
+   AUCUN code de parrainage (la formule Code_Parrainage exige
+   Nb_Locations >= 1) tant qu'Eloy n'a pas confirmé une vraie
+   location via /loyalty-checkin. Impossible d'obtenir un avantage
+   simplement en s'inscrivant.
+
+   Si l'email existe déjà, ne fait AUCUNE modification — renvoie
+   simplement son statut actuel (évite d'écraser un historique
+   existant par une inscription en double).
+   -------------------------------------------------------------- */
+async function handleLoyaltySignup(request, env) {
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return jsonResponse({ error: "Corps de requête invalide." }, 400, env);
+  }
+
+  const email = (body.email || "").trim().toLowerCase();
+  const name = (body.name || "").trim();
+  const phone = (body.phone || "").trim();
+
+  if (!email || !isValidEmail(email)) {
+    return jsonResponse({ error: "E-mail invalide." }, 400, env);
+  }
+  if (!name) {
+    return jsonResponse({ error: "Nom requis." }, 400, env);
+  }
+
+  const searchRes = await airtableFetch(
+    env,
+    TABLE_LOYALTY,
+    `?filterByFormula=${encodeURIComponent(`LOWER({Email})="${email}"`)}`
+  );
+  const searchData = await searchRes.json();
+  const existing = (searchData.records || [])[0];
+
+  if (existing) {
+    // Déjà inscrit — ne rien modifier, juste renvoyer son statut actuel.
+    const f = existing.fields;
+    return jsonResponse(
+      {
+        success: true,
+        alreadyExists: true,
+        name: f.Nom || null,
+        nbLocations: Number(f.Nb_Locations || 0),
+        referralCode: f.Code_Parrainage || null,
+      },
+      200,
+      env
+    );
+  }
+
+  const fields = { Nom: name, Email: email, Nb_Locations: 0 };
+  if (phone) fields.Telephone = phone;
+
+  const createRes = await airtableFetch(env, TABLE_LOYALTY, "", {
+    method: "POST",
+    body: JSON.stringify({ fields }),
+  });
+
+  if (!createRes.ok) {
+    const errText = await createRes.text();
+    return jsonResponse({ error: "Erreur Airtable lors de l'inscription.", detail: errText }, 502, env);
+  }
+
+  const record = await createRes.json();
+  const f = record.fields;
+
+  return jsonResponse(
+    {
+      success: true,
+      alreadyExists: false,
+      name: f.Nom || null,
+      nbLocations: Number(f.Nb_Locations || 0),
+      referralCode: f.Code_Parrainage || null,
     },
     200,
     env
@@ -398,6 +499,9 @@ export default {
     }
     if (url.pathname === "/loyalty-status" && request.method === "POST") {
       return handleLoyaltyStatus(request, env);
+    }
+    if (url.pathname === "/loyalty-signup" && request.method === "POST") {
+      return handleLoyaltySignup(request, env);
     }
     if (url.pathname === "/loyalty-checkin" && request.method === "POST") {
       return handleLoyaltyCheckin(request, env);
