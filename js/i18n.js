@@ -1152,4 +1152,11 @@ const TRANSLATIONS = {
                        es: "Únase al Rent2Ride Club ahora: hasta −15% de descuento, estatus VIP y 50 € por cada referido.",
                        en: "Join the Rent2Ride Club now: up to −15% off, VIP status, and €50 for every referral." },
   home_loyalty_cta: { fr: "Rejoindre le Club", es: "Unirse al Club", en: "Join the Club" }
+  ,
+
+  /* ---------------- Clés manquantes détectées (balades.html — carte interactive) ---------------- */
+  label_locate: { fr: "Localiser sur la carte", es: "Localizar en el mapa", en: "Locate on map" },
+  map_hint: { fr: "Cliquez un tracé pour voir le détail de la balade",
+              es: "Haga clic en una ruta para ver el detalle del recorrido",
+              en: "Click a route to see the ride details" }
 };

@@ -25,11 +25,13 @@
    - STAFF_PIN        (secret) : code d'accès interne pour /loyalty-checkin
 
    LIMITE CONNUE SUR /loyalty-signup :
-   Cette route est publique et n'a aucune protection anti-spam/anti-bot
-   au-delà d'une validation basique du format email. Un Worker Cloudflare
-   seul (sans KV/Durable Objects) ne permet pas facilement de limiter le
-   nombre de requêtes par IP. Risque faible vu le volume attendu, mais à
-   surveiller si le site reçoit du trafic non désiré sur cette route.
+   Un champ honeypot ("website") protège contre les bots génériques qui
+   remplissent tous les champs d'un formulaire automatiquement. Ce n'est PAS
+   une protection contre un abus ciblé et volontaire (script écrit
+   spécifiquement pour cette route) — pour ça il faudrait un vrai captcha
+   (ex: Cloudflare Turnstile) ou du rate-limiting par IP (nécessite KV/Durable
+   Objects, non implémenté). Risque jugé faible vu le volume attendu ; à
+   renforcer si un abus réel est constaté dans Airtable.
    =============================================================== */
 
 const TABLE_GIFTCARDS = "GiftCards";
@@ -243,6 +245,14 @@ async function handleLoyaltySignup(request, env) {
     body = await request.json();
   } catch {
     return jsonResponse({ error: "Corps de requête invalide." }, 400, env);
+  }
+
+  // Anti-bot honeypot : ce champ doit rester vide pour un vrai visiteur.
+  // Un bot générique qui remplit tous les champs du formulaire tombera dedans.
+  // On renvoie un succès factice (200, jamais d'erreur explicite) pour ne pas
+  // donner d'indice au bot que sa requête a été détectée et rejetée.
+  if ((body.website || "").trim() !== "") {
+    return jsonResponse({ success: true, alreadyExists: false, name: null, nbLocations: 0, referralCode: null }, 200, env);
   }
 
   const email = (body.email || "").trim().toLowerCase();

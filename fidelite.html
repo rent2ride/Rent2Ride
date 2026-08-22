@@ -394,6 +394,15 @@
     <p style="margin:14px 0 0;" data-i18n="fidelite_notfound_signup_p">Vous n'avez encore jamais loué chez nous ? Vous pouvez déjà rejoindre le Rent2Ride Club — vos futures locations compteront automatiquement.</p>
 
     <form id="signupForm" style="margin-top:16px; display:flex; flex-direction:column; gap:10px;">
+      <!-- Champ piège anti-bot : invisible pour un humain (position hors écran + aria-hidden),
+           mais généralement rempli automatiquement par les bots/scripts génériques.
+           Ne PAS utiliser display:none ou visibility:hidden, certains bots les détectent
+           et les ignorent volontairement — la technique la plus fiable reste de positionner
+           le champ hors du viewport tout en le laissant visuellement "normal" dans le DOM. -->
+      <div style="position:absolute; left:-9999px; top:-9999px;" aria-hidden="true">
+        <label for="signupWebsite">Ne pas remplir ce champ</label>
+        <input type="text" id="signupWebsite" name="website" tabindex="-1" autocomplete="off">
+      </div>
       <input type="text" id="signupName" placeholder="Prénom" required style="padding:12px 14px; border:1px solid var(--loy-line); border-radius:8px; font-family:inherit; font-size:14px;">
       <input type="tel" id="signupPhone" placeholder="Téléphone (optionnel)" style="padding:12px 14px; border:1px solid var(--loy-line); border-radius:8px; font-family:inherit; font-size:14px;">
       <button type="submit" id="signupSubmit" data-i18n="fidelite_signup_btn" style="background:var(--loy-gold); color:#fff; border:none; border-radius:8px; padding:12px; font-weight:700; cursor:pointer; font-family:inherit;">Rejoindre le Rent2Ride Club</button>
@@ -746,6 +755,7 @@
     const name = document.getElementById("signupName").value.trim();
     const phone = document.getElementById("signupPhone").value.trim();
     const email = emailInput.value.trim();
+    const website = document.getElementById("signupWebsite").value; // honeypot — doit rester vide
 
     signupError.style.display = "none";
 
@@ -763,7 +773,7 @@
       const res = await fetch(SIGNUP_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, phone, email }),
+        body: JSON.stringify({ name, phone, email, website }),
       });
       const data = await res.json();
 
