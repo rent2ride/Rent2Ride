@@ -996,9 +996,9 @@ const TRANSLATIONS = {
 
   /* ---------------- BLOG — bloc CTA + date de mise à jour (fin d'article) ---------------- */
   blog_meta_date: { fr: "Mis à jour août 2026", es: "Actualizado en agosto de 2026", en: "Updated August 2026" },
-  blog_cta_p:     { fr: "Prêt à rouler sur ces routes ? Découvrez notre flotte Yamaha, BMW et Honda disponible sur la Costa del Sol.",
-                    es: "¿Listo para rodar por estas carreteras? Descubre nuestra flota Yamaha, BMW y Honda disponible en la Costa del Sol.",
-                    en: "Ready to ride these roads? Discover our Yamaha, BMW and Honda fleet available on the Costa del Sol." },
+  blog_cta_p:     { fr: "Prêt à rouler sur ces routes ? Découvrez notre flotte Yamaha disponible sur la Costa del Sol.",
+                    es: "¿Listo para rodar por estas carreteras? Descubre nuestra flota Yamaha disponible en la Costa del Sol.",
+                    en: "Ready to ride these roads? Discover our Yamaha fleet available on the Costa del Sol." },
   blog_cta_btn:   { fr: "Voir le catalogue", es: "Ver el catálogo", en: "View the fleet" },
 
   /* ---------------- BLOG — article "Assurance" (bas_*) ---------------- */
