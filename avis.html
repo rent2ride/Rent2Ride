@@ -130,10 +130,16 @@
       </div>
 
       <div id="rv_error" class="form-warning"></div>
-      <div id="rv_success" class="form-success">Merci pour votre avis ! Il apparaît maintenant dans la liste. 🎉</div>
+      <div id="rv_success" class="form-success">Merci pour votre avis ! Il sera visible sur cette page après validation par notre équipe. 🎉</div>
 
-      <button class="btn btn-primary btn-block" onclick="submitReview()">Publier mon avis</button>
-      <p style="font-size:.75rem; color:var(--c-ink-faint); text-align:center; margin:0;">Votre avis est enregistré sur cet appareil.</p>
+      <!-- Champ piège anti-bot, invisible pour un humain -->
+      <div style="position:absolute; left:-9999px; top:-9999px;" aria-hidden="true">
+        <label for="rv_website">Ne pas remplir ce champ</label>
+        <input type="text" id="rv_website" tabindex="-1" autocomplete="off">
+      </div>
+
+      <button class="btn btn-primary btn-block" id="rv_submit_btn" onclick="submitReview()">Publier mon avis</button>
+      <p style="font-size:.75rem; color:var(--c-ink-faint); text-align:center; margin:0;">Votre avis sera visible publiquement après validation par notre équipe.</p>
     </div>
   </div>
 </section>
@@ -315,11 +321,17 @@
 <script>
 /* =========================================================
    SYSTÈME D'AVIS — Rent2Ride
-   Les avis sont stockés dans localStorage du navigateur.
-   Ils apparaissent immédiatement et persistent entre les visites.
+   ---------------------------------------------------------
+   Les avis sont envoyés au Cloudflare Worker (rent2ride-giftcards)
+   qui les stocke dans Airtable (table "Avis"). Un avis soumis
+   n'apparaît PAS immédiatement : il doit être approuvé manuellement
+   (case "Approved" dans Airtable) avant de devenir visible sur le
+   site pour tous les visiteurs. Ce n'est plus un stockage local par
+   appareil — c'est une vraie liste partagée, identique pour tout
+   le monde.
    ========================================================= */
 
-const REVIEWS_STORAGE_KEY = 'rent2ride_reviews';
+const REVIEWS_API_BASE = "https://rent2ride-giftcards.sch-eric-es.workers.dev";
 let selectedStars = 0;
 
 /* ---- Sélecteur d'étoiles ---- */
@@ -345,13 +357,15 @@ document.getElementById('rv_text').addEventListener('input', function(){
   document.getElementById('rv_count').textContent = this.value.length + ' / 400';
 });
 
-/* ---- Soumettre un avis ---- */
-function submitReview(){
+/* ---- Soumettre un avis (envoi au Worker, jamais direct au localStorage) ---- */
+async function submitReview(){
   const name  = document.getElementById('rv_name').value.trim();
   const text  = document.getElementById('rv_text').value.trim();
   const model = document.getElementById('rv_model').value;
+  const website = document.getElementById('rv_website').value; // honeypot, doit rester vide
   const error = document.getElementById('rv_error');
   const success = document.getElementById('rv_success');
+  const submitBtn = document.getElementById('rv_submit_btn');
 
   error.classList.remove('show');
   success.classList.remove('show');
@@ -369,72 +383,88 @@ function submitReview(){
     error.classList.add('show'); return;
   }
 
-  const now   = new Date();
-  const month = now.toLocaleDateString('fr-FR', { month:'long', year:'numeric' });
-  const initials = name.split(' ').map(w => w[0].toUpperCase()).join('').slice(0,2);
+  submitBtn.disabled = true;
+  const originalLabel = submitBtn.textContent;
+  submitBtn.textContent = '…';
 
-  const review = { stars: selectedStars, name, initials, text, model, month,
-                   id: Date.now() };
+  try {
+    const res = await fetch(`${REVIEWS_API_BASE}/review-submit`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stars: selectedStars, name, model, text, website }),
+    });
 
-  const stored = JSON.parse(localStorage.getItem(REVIEWS_STORAGE_KEY) || '[]');
-  stored.unshift(review);
-  localStorage.setItem(REVIEWS_STORAGE_KEY, JSON.stringify(stored));
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      error.textContent = data.error || 'Une erreur est survenue, réessayez.';
+      error.classList.add('show');
+      return;
+    }
 
-  renderUserReviews();
-  success.classList.add('show');
+    success.classList.add('show');
 
-  /* Reset form */
-  selectedStars = 0;
-  highlightStars(0);
-  document.getElementById('starLabel').textContent = 'Cliquez pour noter';
-  document.getElementById('rv_name').value  = '';
-  document.getElementById('rv_text').value  = '';
-  document.getElementById('rv_model').value = '';
-  document.getElementById('rv_count').textContent = '0 / 400';
+    /* Reset form */
+    selectedStars = 0;
+    highlightStars(0);
+    document.getElementById('starLabel').textContent = 'Cliquez pour noter';
+    document.getElementById('rv_name').value  = '';
+    document.getElementById('rv_text').value  = '';
+    document.getElementById('rv_model').value = '';
+    document.getElementById('rv_count').textContent = '0 / 400';
+  } catch (err) {
+    error.textContent = 'Erreur réseau, réessayez.';
+    error.classList.add('show');
+    console.error('Review submit error:', err);
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalLabel;
+  }
 }
 
-/* ---- Afficher les avis stockés ---- */
-function renderUserReviews(){
+/* ---- Charger et afficher les avis approuvés (partagés, visibles par tous) ---- */
+async function loadApprovedReviews(){
   const grid = document.getElementById('userReviewsGrid');
   if (!grid) return;
-  const stored = JSON.parse(localStorage.getItem(REVIEWS_STORAGE_KEY) || '[]');
-  if (!stored.length){ grid.innerHTML = ''; return; }
 
-  grid.innerHTML = stored.map(r => `
-    <div class="review-card" style="border-color:var(--c-accent-soft);">
-      <div class="review-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div>
-      <p class="review-text">${escapeHtml(r.text)}</p>
-      <div class="review-author">
-        <div class="review-avatar" style="background:var(--c-accent-soft); color:var(--c-accent);">
-          ${r.initials}
-        </div>
-        <div>
-          <div class="review-name">${escapeHtml(r.name)}</div>
-          <div class="review-meta">${r.model ? r.model + ' · ' : ''}${r.month}
-            <button onclick="deleteReview(${r.id})"
-              style="background:none;border:0;color:var(--c-ink-faint);cursor:pointer;font-size:.75rem;margin-left:8px;">
-              ✕ supprimer
-            </button>
+  try {
+    const res = await fetch(`${REVIEWS_API_BASE}/reviews-list`);
+    if (!res.ok) return;
+    const data = await res.json();
+    const reviews = data.reviews || [];
+
+    if (!reviews.length){ grid.innerHTML = ''; return; }
+
+    grid.innerHTML = reviews.map(r => {
+      const initials = (r.name || '').split(' ').map(w => w[0]?.toUpperCase() || '').join('').slice(0, 2);
+      return `
+        <div class="review-card" style="border-color:var(--c-accent-soft);">
+          <div class="review-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5 - r.stars)}</div>
+          <p class="review-text">${escapeHtml(r.text)}</p>
+          <div class="review-author">
+            <div class="review-avatar" style="background:var(--c-accent-soft); color:var(--c-accent);">
+              ${initials}
+            </div>
+            <div>
+              <div class="review-name">${escapeHtml(r.name)}</div>
+              <div class="review-meta">${r.model ? escapeHtml(r.model) + ' · ' : ''}Client vérifié</div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-  `).join('');
-}
-
-function deleteReview(id){
-  const stored = JSON.parse(localStorage.getItem(REVIEWS_STORAGE_KEY) || '[]');
-  localStorage.setItem(REVIEWS_STORAGE_KEY, JSON.stringify(stored.filter(r => r.id !== id)));
-  renderUserReviews();
+      `;
+    }).join('');
+  } catch (err) {
+    console.error('Reviews list error:', err);
+  }
 }
 
 function escapeHtml(str){
+  if (!str) return '';
   return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
             .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
 }
 
-/* Charger les avis au démarrage */
-document.addEventListener('DOMContentLoaded', renderUserReviews);
+/* Charger les avis approuvés au démarrage */
+document.addEventListener('DOMContentLoaded', loadApprovedReviews);
 </script>
 </body>
 </html>

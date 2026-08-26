@@ -37,6 +37,7 @@
 const TABLE_GIFTCARDS = "GiftCards";
 const TABLE_PROMOCODES = "PromoCodes";
 const TABLE_LOYALTY = "Clients_Fidelite";
+const TABLE_REVIEWS = "Avis";
 
 function corsHeaders(env) {
   return {
@@ -439,6 +440,100 @@ async function handleLoyaltyCheckin(request, env) {
    Airtable via API REST standard). Risque faible vu le volume
    attendu d'un site de location de motos, mais à garder en tête.
    ----------------------------------------------------------- */
+/* --------------------------------------------------------------
+   AVIS CLIENTS — POST /review-submit (public) + GET /reviews-list (public)
+   --------------------------------------------------------------
+   Table Airtable "Avis" attendue avec les champs :
+   - Stars    (nombre, 1 à 5)
+   - Name     (texte, ex: "Julien M.")
+   - Model    (texte, optionnel, ex: "Yamaha MT-07")
+   - Text     (texte long)
+   - Approved (case à cocher, DÉCOCHÉE par défaut)
+   - CreatedDate (Created time — automatique, généré par Airtable)
+
+   Modération manuelle : un avis soumis n'apparaît PAS immédiatement.
+   Eric/Eloy doivent cocher "Approved" directement dans Airtable pour
+   qu'il devienne visible publiquement sur /reviews-list. Simple filet
+   anti-spam/anti-abus pour une activité qui démarre — pas d'interface
+   de modération dédiée pour l'instant, juste la case à cocher Airtable.
+
+   Un champ honeypot ("website") protège contre les bots génériques,
+   même logique que pour /loyalty-signup.
+   -------------------------------------------------------------- */
+async function handleReviewSubmit(request, env) {
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return jsonResponse({ error: "Corps de requête invalide." }, 400, env);
+  }
+
+  // Honeypot anti-bot — voir handleLoyaltySignup pour le même principe.
+  if ((body.website || "").trim() !== "") {
+    return jsonResponse({ success: true }, 200, env);
+  }
+
+  const stars = Number(body.stars);
+  const name = (body.name || "").trim();
+  const model = (body.model || "").trim();
+  const text = (body.text || "").trim();
+
+  if (!Number.isInteger(stars) || stars < 1 || stars > 5) {
+    return jsonResponse({ error: "Note invalide." }, 400, env);
+  }
+  if (!name) {
+    return jsonResponse({ error: "Nom requis." }, 400, env);
+  }
+  if (text.length < 20) {
+    return jsonResponse({ error: "Avis trop court (20 caractères minimum)." }, 400, env);
+  }
+  if (text.length > 500) {
+    return jsonResponse({ error: "Avis trop long (500 caractères maximum)." }, 400, env);
+  }
+
+  const createRes = await airtableFetch(env, TABLE_REVIEWS, "", {
+    method: "POST",
+    body: JSON.stringify({
+      fields: {
+        Stars: stars,
+        Name: name,
+        Model: model,
+        Text: text,
+        Approved: false,
+      },
+    }),
+  });
+
+  if (!createRes.ok) {
+    const errText = await createRes.text();
+    return jsonResponse({ error: "Erreur Airtable lors de l'envoi.", detail: errText }, 502, env);
+  }
+
+  return jsonResponse({ success: true }, 200, env);
+}
+
+async function handleReviewsList(request, env) {
+  const res = await airtableFetch(
+    env,
+    TABLE_REVIEWS,
+    `?filterByFormula=${encodeURIComponent("{Approved}=1")}&sort[0][field]=CreatedDate&sort[0][direction]=desc`
+  );
+
+  if (!res.ok) {
+    return jsonResponse({ reviews: [] }, 200, env);
+  }
+
+  const data = await res.json();
+  const reviews = (data.records || []).map((r) => ({
+    stars: Number(r.fields.Stars || 0),
+    name: r.fields.Name || "",
+    model: r.fields.Model || "",
+    text: r.fields.Text || "",
+  }));
+
+  return jsonResponse({ reviews }, 200, env);
+}
+
 async function handleValidatePromo(request, env) {
   let body;
   try {
@@ -515,6 +610,12 @@ export default {
     }
     if (url.pathname === "/loyalty-checkin" && request.method === "POST") {
       return handleLoyaltyCheckin(request, env);
+    }
+    if (url.pathname === "/review-submit" && request.method === "POST") {
+      return handleReviewSubmit(request, env);
+    }
+    if (url.pathname === "/reviews-list" && request.method === "GET") {
+      return handleReviewsList(request, env);
     }
 
     return jsonResponse({ error: "Route inconnue." }, 404, env);
