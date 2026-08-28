@@ -1898,13 +1898,14 @@ if ("serviceWorker" in navigator){
 }
 // --- Mise à jour dynamique de la bannière des inclusions ---
 function updateInclusBanner(lang) {
+  console.log("Langue reçue par la bannière :", lang); // <--- Ligne de test
   const bannerImg = document.getElementById('inclusBanner');
   if (!bannerImg) return;
   
-  if (lang === 'esp' || lang === 'es') {
+  if (lang === 'esp' || lang === 'es' || lang === 'ES') {
     bannerImg.src = './images/inclus-locations-banner-esp.jpg';
     bannerImg.alt = 'Incluido en todos los alquileres';
-  } else if (lang === 'ang' || lang === 'en') {
+  } else if (lang === 'ang' || lang === 'en' || lang === 'EN') {
     bannerImg.src = './images/inclus-locations-banner-ang.jpg';
     bannerImg.alt = 'Included in all rentals';
   } else {
