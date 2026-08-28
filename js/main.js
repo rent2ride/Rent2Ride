@@ -158,8 +158,8 @@ function applyTranslations(lang){
 
     document.querySelectorAll("[data-i18n]").forEach(el => {
         const key = el.getAttribute("data-i18n");
-        if (window.i18n && window.i18n[lang] && window.i18n[lang][key]) {
-            el.textContent = window.i18n[lang][key];
+        if (TRANSLATIONS[key] && TRANSLATIONS[key][lang]){
+            el.textContent = TRANSLATIONS[key][lang];
         }
     });
 
