@@ -534,9 +534,9 @@ const TRANSLATIONS = {
 
   packs_eyebrow:   { fr: "NOS OFFRES", es: "NUESTRAS OFERTAS", en: "OUR OFFERS" },
   packs_title:     { fr: "La liberté de rouler, sans limite", es: "La libertad de rodar, sin límites", en: "Ride More. Worry Less." },
-  packs_sub:       { fr: "Kilométrage illimité sur toutes nos motos. Tarifs transparents, sans frais cachés. Choisissez la formule qui correspond à votre aventure.",
-                     es: "Kilómetros ilimitados en todas nuestras motos. Tarifas transparentes, sin cargos ocultos. Elija la fórmula que se adapte a su aventura.",
-                     en: "Unlimited mileage on all our bikes. Transparent pricing, no hidden fees. Choose the formula that fits your adventure." },
+  packs_sub:       { fr: "Toutes les tarifs sont indicatifs pour la Yamaha MT-07 — ajustés selon le modèle choisi.", 
+                     es: "Todas las tarifas son orientativas para la Yamaha MT-07 — ajustadas según el modelo elegido.", 
+                     en: "All rates are indicative for the Yamaha MT-07 — adjusted depending on the model chosen." },
 
   pack_popular:    { fr: "Le plus populaire", es: "El más popular", en: "Most popular" },
   pack_best:       { fr: "Meilleur rapport qualité/prix", es: "Mejor relación calidad/precio", en: "Best value" },
