@@ -163,7 +163,18 @@ function applyTranslations(lang){
       el.textContent = entry[lang];
     }
   });
-  
+  // --- FORÇAGE DIRECT DES BANNIÈRES ICI ---
+    const banner = document.getElementById('inclusBanner');
+    if (banner) {
+        if (lang === 'es' || lang === 'esp' || lang === 'ES') {
+            banner.src = './images/inclus-locations-banner-esp.jpg';
+        } else if (lang === 'en' || lang === 'ang' || lang === 'EN') {
+            banner.src = './images/inclus-locations-banner-ang.jpg';
+        } else {
+            banner.src = './images/inclus-locations-banner-fr.jpg';
+        }
+    }
+}
 updateClubBanner(lang);
 
   document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
