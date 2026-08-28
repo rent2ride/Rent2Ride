@@ -1901,10 +1901,10 @@ function updateInclusBanner(lang) {
   const bannerImg = document.getElementById('inclusBanner');
   if (!bannerImg) return;
   
-  if (lang === 'es' || lang === 'esp') {
+  if (lang === 'esp' || lang === 'es') {
     bannerImg.src = './images/inclus-locations-banner-esp.jpg';
     bannerImg.alt = 'Incluido en todos los alquileres';
-  } else if (lang === 'en' || lang === 'ang') {
+  } else if (lang === 'ang' || lang === 'en') {
     bannerImg.src = './images/inclus-locations-banner-ang.jpg';
     bannerImg.alt = 'Included in all rentals';
   } else {
