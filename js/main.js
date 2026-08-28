@@ -1868,6 +1868,8 @@ document.addEventListener("DOMContentLoaded", () => {
   initGalleryLightbox();
   initWhatsAppWidget();
   initMomovenLinks();
+  initBikeGalleries();
+updateClubBanner(currentLang); // Ajoutez cette ligne pour appliquer la bonne image dès l'ouverture
   refreshAvailabilityBadges();
   if (typeof updateAvailabilityCounter === "function") updateAvailabilityCounter();
   initCart();
