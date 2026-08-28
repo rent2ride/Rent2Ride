@@ -158,13 +158,14 @@ function applyTranslations(lang){
 
     document.querySelectorAll("[data-i18n]").forEach(el => {
         const key = el.getAttribute("data-i18n");
-        if (TRANSLATIONS[key] && TRANSLATIONS[key][lang]){
+        if (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[key] && TRANSLATIONS[key][lang]){
             el.textContent = TRANSLATIONS[key][lang];
         }
     });
 
     document.querySelectorAll(".lang-switch button").forEach(btn => {
-        btn.classList.toggle("active", btn.dataset.lang === lang);
+        const btnLang = btn.dataset.lang || btn.getAttribute('onclick');
+        btn.classList.toggle("active", btnLang && btnLang.includes(lang));
     });
 
     const banner = document.getElementById('inclusBanner');
