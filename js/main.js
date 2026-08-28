@@ -163,6 +163,7 @@ function applyTranslations(lang){
       el.textContent = entry[lang];
     }
   });
+  
 updateClubBanner(lang);
 
   document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
