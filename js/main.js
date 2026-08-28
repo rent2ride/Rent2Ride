@@ -195,6 +195,9 @@ updateClubBanner(lang);
   if (typeof updateAvailabilityCounter === "function") updateAvailabilityCounter();
 
   if (typeof renderCartDrawer === "function") renderCartDrawer();
+  // Ajoutez vos bannières ici :
+  updateClubBanner(lang);
+  updateInclusBanner(lang);
 }
 
 function setLang(lang){
