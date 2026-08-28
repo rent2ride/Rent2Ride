@@ -1869,7 +1869,8 @@ document.addEventListener("DOMContentLoaded", () => {
   initWhatsAppWidget();
   initMomovenLinks();
   initBikeGalleries();
-updateClubBanner(currentLang); // Ajoutez cette ligne pour appliquer la bonne image dès l'ouverture
+updateClubBanner(currentLang); 
+updateInclusBanner(currentLang);
   refreshAvailabilityBadges();
   if (typeof updateAvailabilityCounter === "function") updateAvailabilityCounter();
   initCart();
@@ -1892,19 +1893,19 @@ if ("serviceWorker" in navigator){
     navigator.serviceWorker.register("./js/sw.js", { scope: "./" }).catch(() => {});
   });
 }
-// --- Mise à jour dynamique de la bannière du Club Rent2Ride ---
-function updateClubBanner(lang) {
-  const bannerImg = document.getElementById('clubBanner');
-  if (bannerImg) {
-    if (lang === 'es') {
-      bannerImg.src = './images/rent2ride-club-banner-esp.jpg';
-      bannerImg.alt = 'Rent2Ride Club Banner - ES';
-    } else if (lang === 'en') {
-      bannerImg.src = './images/rent2ride-club-banner-ang.jpg';
-      bannerImg.alt = 'Rent2Ride Club Banner - EN';
-    } else {
-      bannerImg.src = './images/rent2ride-club-banner-fr.jpg';
-      bannerImg.alt = 'Rent2Ride Club Banner - FR';
-    }
+// --- Mise à jour dynamique de la bannière des inclusions ---
+function updateInclusBanner(lang) {
+  const bannerImg = document.getElementById('inclusBanner');
+  if (!bannerImg) return;
+  
+  if (lang === 'es') {
+    bannerImg.src = './images/inclus-locations-banner-esp.jpg';
+    bannerImg.alt = 'Incluido en todos los alquileres';
+  } else if (lang === 'en') {
+    bannerImg.src = './images/inclus-locations-banner-ang.jpg';
+    bannerImg.alt = 'Included in all rentals';
+  } else {
+    bannerImg.src = './images/inclus-locations-banner-fr.jpg';
+    bannerImg.alt = 'Inclus dans toutes les locations';
   }
 }
