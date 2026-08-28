@@ -1575,6 +1575,7 @@ document.addEventListener("DOMContentLoaded", () => {
   syncDateInputs();
   initFaqAccordion();
   initGalleryLightbox();
+  updateInclusBanner(getCurrentLang());
   initWhatsAppWidget();
   initMomovenLinks();
   initBikeGalleries();
