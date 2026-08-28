@@ -153,17 +153,20 @@ function getCurrentLang(){
   return LANGS.includes(nav) ? nav : "fr";
 }
 
-function applyTranslations(lang){
-  document.documentElement.lang = lang;
+unction applyTranslations(lang){
+    document.documentElement.lang = lang;
 
-  document.querySelectorAll("[data-i18n]").forEach(el => {
-    const key = el.getAttribute("data-i18n");
-    const entry = TRANSLATIONS[key];
-    if (entry && entry[lang] !== undefined){
-      el.textContent = entry[lang];
-    }
-  });
-  // --- FORÇAGE DIRECT DES BANNIÈRES ICI ---
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (window.i18n && window.i18n[lang] && window.i18n[lang][key]) {
+            el.textContent = window.i18n[lang][key];
+        }
+    });
+
+    document.querySelectorAll(".lang-switch button").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.lang === lang);
+    });
+
     const banner = document.getElementById('inclusBanner');
     if (banner) {
         if (lang === 'es' || lang === 'esp' || lang === 'ES') {
@@ -174,6 +177,8 @@ function applyTranslations(lang){
             banner.src = './images/inclus-locations-banner-fr.jpg';
         }
     }
+
+    if (typeof updateClubBanner === "function") updateClubBanner(lang);
 }
 updateClubBanner(lang);
 
