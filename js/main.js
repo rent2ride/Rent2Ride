@@ -28,19 +28,46 @@ function updatePageTranslations(lang = currentLang) {
             }
         }
     });
-}
 
-// Initialisation au chargement du DOM
-document.addEventListener('DOMContentLoaded', () => {
-    updatePageTranslations(currentLang);
-});
+    document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+        const key = el.getAttribute("data-i18n-placeholder");
+        const entry = TRANSLATIONS[key];
+        if (entry && entry[lang] !== undefined){
+            el.setAttribute("placeholder", entry[lang]);
+        }
+    });
+
+    const titleEl = document.querySelector("title[data-i18n]");
+    if (titleEl){
+        const key = titleEl.getAttribute("data-i18n");
+        if (TRANSLATIONS[key]) document.title = TRANSLATIONS[key][lang];
+    }
+
+    document.querySelectorAll(".lang-switch button").forEach(btn => {
+        const btnLang = btn.dataset.lang || btn.getAttribute('onclick');
+        btn.classList.toggle("active", btnLang && btnLang.includes(lang));
+    });
+
+    if (typeof renderCalendar === "function" && document.getElementById("calendarGrid")){
+        renderCalendar();
+        updateBookingSummary();
+    }
+
+    if (typeof updateWhatsAppLink === "function") updateWhatsAppLink();
+    if (typeof refreshAvailabilityBadges === "function") refreshAvailabilityBadges();
+    if (typeof updateAvailabilityCounter === "function") updateAvailabilityCounter();
+    if (typeof renderCartDrawer === "function") renderCartDrawer();
+
+    if (typeof updateClubBanner === "function") updateClubBanner(lang);
+    updateInclusBanner(lang);
+}
 
 /* =========================================================
    RENT2RIDE — PREMIUM EDITION
    main.js
    ---------------------------------------------------------
    Sections:
-   1. PRICING DATA & WHATSAPP NUMBER — edit your real values here
+   1. PRICING DATA & WHATSAPP NUMBER
    2. LANGUAGE SWITCHER
    3. MOBILE NAV TOGGLE
    4. BOOKING CALENDAR
@@ -51,12 +78,6 @@ document.addEventListener('DOMContentLoaded', () => {
    9. WHATSAPP WIDGET
    ========================================================= */
 
-/* =========================================================
-   1. PRICING DATA & CONTACT DETAILS
-   ---------------------------------------------------------
-   Edit these values — every page that shows a price or the
-   WhatsApp number reads from here.
-   ========================================================= */
 const PRICING = {
   mt07:     { day: 55,  week: 339,  month: 1155, deposit: 300, key: "bike_mt07_name" },
   mt09:     { day: 75,  week: 462,  month: 1575, deposit: 500, key: "bike_mt09_name" },
@@ -64,15 +85,6 @@ const PRICING = {
   tracer9:  { day: 89,  week: 549,  month: 1869, deposit: 600, key: "bike_tracer9_name" },
 };
 
-/* =========================================================
-   PACKS (page "Nos offres")
-   ---------------------------------------------------------
-   Source de vérité pour le système "?pack=xxx" qui relie un
-   clic sur "Réserver ce pack" (offres.html) au formulaire de
-   réservation (reservation.html). Si vous changez un nom ou
-   une durée de pack dans le HTML de offres.html, changez-le
-   aussi ici pour rester cohérent.
-   ========================================================= */
 const PACKS = {
   p1: { name: "Explorer",        days: 1  },
   p2: { name: "Weekend Escape",  days: 2  },
@@ -82,54 +94,18 @@ const PACKS = {
   p6: { name: "Grand Tour",      days: 14 },
 };
 
-/* =========================================================
-   MODÈLES TEMPORAIREMENT INDISPONIBLES
-   ---------------------------------------------------------
-   Source de vérité UNIQUE pour "ce modèle n'est pas louable
-   pour l'instant", lue à la fois par catalogue.html (badges +
-   compteur) et reservation.html (menu déroulant), pour que les
-   deux pages restent toujours cohérentes entre elles. C'est
-   différent du système AVAILABILITY plus bas, qui ne bloque
-   que certaines dates déjà réservées.
-   Pour remettre un modèle en location : retirez-le simplement
-   de ce tableau.
-   ========================================================= */
 const PERMANENTLY_UNAVAILABLE = ["mt09", "tracer7", "tracer9"];
 
 function isModelPermanentlyUnavailable(model){
   return PERMANENTLY_UNAVAILABLE.includes(model);
 }
 
-/* =========================================================
-   CODES PROMO
-   ---------------------------------------------------------
-   Les codes et pourcentages ne sont PLUS stockés ici (ancien
-   système visible dans le code source du site — corrigé le
-   17/08/2026). La validation se fait désormais côté serveur,
-   via le Worker Cloudflare existant (endpoint /validate-promo),
-   qui interroge une table Airtable "PromoCodes". Voir worker.js.
-
-   appliedPromoCode contient désormais soit null, soit un objet
-   { code, percent } renvoyé par le serveur après validation.
-   ========================================================= */
 let appliedPromoCode = null;
-
-/* WhatsApp business number, international format, no spaces or symbols.
-   Example shown is a PLACEHOLDER — replace with your real number. */
 const WHATSAPP_NUMBER = "34649115400";
-
-/* =========================================================
-   NOTIFICATION AUTOMATIQUE — RÉSERVATIONS & COMMANDES BOUTIQUE
-   ---------------------------------------------------------
-   Envoi via Formspree (formspree.io) : aucun secret exposé
-   côté client, contrairement à un appel direct à l'API d'un
-   bot Telegram. Chaque soumission arrive par e-mail et dans
-   le tableau de bord Formspree.
-   ========================================================= */
 const NOTIF_FORM_ENDPOINT = "https://formspree.io/f/xvkpadnq";
 
 function sendTelegramNotification(text){
-  if (!NOTIF_FORM_ENDPOINT) return; // pas encore configuré
+  if (!NOTIF_FORM_ENDPOINT) return;
   fetch(NOTIF_FORM_ENDPOINT, {
     method: "POST",
     headers: { "Content-Type": "application/json", "Accept": "application/json" },
@@ -137,7 +113,6 @@ function sendTelegramNotification(text){
   }).catch(err => console.error("Erreur envoi notification:", err));
 }
 
-/* Momoven listing URL — replace with your real listing once published. */
 const MOMOVEN_URL = "https://www.momoven.com";
 
 /* =========================================================
@@ -153,81 +128,17 @@ function getCurrentLang(){
   return LANGS.includes(nav) ? nav : "fr";
 }
 
-function applyTranslations(lang){
-    document.documentElement.lang = lang;
-
-    document.querySelectorAll("[data-i18n]").forEach(el => {
-        const key = el.getAttribute("data-i18n");
-        if (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[key] && TRANSLATIONS[key][lang]){
-            el.textContent = TRANSLATIONS[key][lang];
-        }
-    });
-
-    document.querySelectorAll(".lang-switch button").forEach(btn => {
-        const btnLang = btn.dataset.lang || btn.getAttribute('onclick');
-        btn.classList.toggle("active", btnLang && btnLang.includes(lang));
-    });
-
-    const banner = document.getElementById('inclusBanner');
-    if (banner) {
-        if (lang === 'es' || lang === 'esp' || lang === 'ES') {
-            banner.src = './images/inclus-locations-banner-esp.jpg';
-        } else if (lang === 'en' || lang === 'ang' || lang === 'EN') {
-            banner.src = './images/inclus-locations-banner-ang.jpg';
-        } else {
-            banner.src = './images/inclus-locations-banner-fr.jpg';
-        }
-    }
-
-    if (typeof updateClubBanner === "function") updateClubBanner(lang);
-}
-updateClubBanner(lang);
-
-  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
-    const key = el.getAttribute("data-i18n-placeholder");
-    const entry = TRANSLATIONS[key];
-    if (entry && entry[lang] !== undefined){
-      el.setAttribute("placeholder", entry[lang]);
-    }
-  });
-
-  const titleEl = document.querySelector("title[data-i18n]");
-  if (titleEl){
-    const key = titleEl.getAttribute("data-i18n");
-    if (TRANSLATIONS[key]) document.title = TRANSLATIONS[key][lang];
-  }
-
-  document.querySelectorAll(".lang-switch button").forEach(btn => {
-    btn.classList.toggle("active", btn.dataset.lang === lang);
-  });
-
-  if (typeof renderCalendar === "function" && document.getElementById("calendarGrid")){
-    renderCalendar();
-    updateBookingSummary();
-  }
-
-  if (typeof updateWhatsAppLink === "function") updateWhatsAppLink();
-
-  if (typeof refreshAvailabilityBadges === "function") refreshAvailabilityBadges();
-  if (typeof updateAvailabilityCounter === "function") updateAvailabilityCounter();
-
-  if (typeof renderCartDrawer === "function") renderCartDrawer();
-  // Ajoutez vos bannières ici :
-  updateClubBanner(lang);
-  updateInclusBanner(lang);
-
-
 function setLang(lang){
   if (!LANGS.includes(lang)) return;
   localStorage.setItem(STORAGE_KEY, lang);
-  applyTranslations(lang);
+  updatePageTranslations(lang);
 }
 
 function initLangSwitcher(){
   document.querySelectorAll(".lang-switch button").forEach(btn => {
     btn.addEventListener("click", () => setLang(btn.dataset.lang));
   });
-  applyTranslations(getCurrentLang());
+  updatePageTranslations(getCurrentLang());
 }
 
 /* =========================================================
@@ -249,11 +160,8 @@ function initMobileNav(){
 let calendarViewDate = new Date();
 calendarViewDate.setDate(1);
 let selectedRange = { start: null, end: null };
-let selectedPackId = null; // pack choisi via ?pack= (voir initBookingForm), inclus dans le récapitulatif
+let selectedPackId = null;
 
-/* Noms de mois et abréviations de jours (lundi en premier, car
-   renderCalendar() calcule le décalage du 1er du mois sur cette
-   base). Utilisé uniquement par le calendrier de réservation. */
 const CALENDAR_STRINGS = {
   fr: {
     months: ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"],
@@ -434,7 +342,7 @@ function updateBookingSummary(){
     hoursFeeOut.textContent = `+${hoursFee} €`;
   }
 
-  const baseForDiscount = total; // la reduction promo s'applique sur le tarif de location, pas sur le supplement horaire
+  const baseForDiscount = total;
 
   if (appliedPromoCode && total > 0){
     const pct = appliedPromoCode.percent;
@@ -465,8 +373,6 @@ function initPromoCode(){
       return;
     }
 
-    // État "vérification en cours" pour éviter les doubles clics
-    // pendant l'appel réseau, et donner un retour visuel clair.
     btn.disabled = true;
     const originalLabel = btn.textContent;
     btn.textContent = "...";
@@ -476,7 +382,7 @@ function initPromoCode(){
     }
 
     try {
-      const base = window.GIFTCARD_API_BASE; // même Worker que les bons cadeaux
+      const base = window.GIFTCARD_API_BASE;
       const res = await fetch(`${base}/validate-promo`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -498,8 +404,6 @@ function initPromoCode(){
         }
       }
     } catch (err){
-      // Panne réseau / Worker injoignable : on n'applique rien,
-      // pas de fausse réduction en cas d'erreur silencieuse.
       appliedPromoCode = null;
       if (feedback){
         feedback.textContent = TRANSLATIONS.promo_invalid[lang];
@@ -561,16 +465,11 @@ function buildBookingSummaryText(form, modelKey){
 }
 
 function initBookingForm(){
-
-
   const form = document.getElementById("bookingForm");
   if (!form) return;
 
   const modelSelect = document.getElementById("bookingModel");
   if (modelSelect){
-    /* Grise et désactive dans le menu déroulant tout modèle listé dans
-       PERMANENTLY_UNAVAILABLE, avec la même logique que le catalogue,
-       pour que les deux pages ne se contredisent jamais. */
     const lang = getCurrentLang();
     Array.from(modelSelect.options).forEach(opt => {
       if (isModelPermanentlyUnavailable(opt.value)){
@@ -579,16 +478,11 @@ function initBookingForm(){
       }
     });
 
-    // S'assure que la sélection par défaut (au chargement de la page,
-    // avant tout choix de l'utilisateur) tombe sur un modèle disponible.
     const firstAvailable = Array.from(modelSelect.options).find(opt => !opt.disabled);
     if (firstAvailable) modelSelect.value = firstAvailable.value;
 
     modelSelect.addEventListener("change", updateBookingSummary);
 
-    // Pre-select model if arriving from a "Book this bike" link (?model=mt09),
-    // mais seulement si ce modèle est bien disponible — sinon on ignore le
-    // lien et on garde la sélection par défaut ci-dessus.
     const params = new URLSearchParams(window.location.search);
     const requestedModel = params.get("model");
     if (requestedModel && PRICING[requestedModel] && !isModelPermanentlyUnavailable(requestedModel)){
@@ -596,24 +490,6 @@ function initBookingForm(){
     }
   }
 
-  /* =========================================================
-     PRÉ-SÉLECTION DEPUIS UN PACK (page "Nos offres")
-     ---------------------------------------------------------
-     Quand le client clique "Réserver ce pack" sur offres.html,
-     le lien contient ?pack=p1 (voir PACKS ci-dessus). On :
-       1. Mémorise le pack choisi dans selectedPackId, pour
-          l'ajouter au récapitulatif envoyé par WhatsApp/e-mail/
-          Telegram (voir buildBookingSummaryText) — c'est ce qui
-          permet de savoir quel pack le client a demandé.
-       2. Pré-remplit automatiquement les dates dans le
-          calendrier (demain → demain + N jours) pour lui éviter
-          une saisie manuelle.
-       3. Affiche une bannière de confirmation au-dessus du
-          formulaire, pour que le client voie bien quel pack il
-          est en train de réserver.
-     Si aucun ?pack= n'est présent (client arrivé directement
-     sur reservation.html), tout ce bloc est simplement ignoré.
-     ========================================================= */
   const packParams = new URLSearchParams(window.location.search);
   const requestedPack = packParams.get("pack");
   if (requestedPack && PACKS[requestedPack]){
@@ -642,9 +518,6 @@ function initBookingForm(){
     const success = document.getElementById("bookingSuccess");
     const warning = document.getElementById("bookingWarning");
 
-    // Garde-fou : un modèle indisponible ne devrait normalement pas être
-    // sélectionnable (options désactivées ci-dessus), mais on bloque quand
-    // même l'envoi ici au cas où.
     if (modelSelect && isModelPermanentlyUnavailable(modelSelect.value)){
       if (warning){
         warning.textContent = TRANSLATIONS.status_unavailable[getCurrentLang()];
@@ -662,21 +535,8 @@ function initBookingForm(){
     }
     if (warning) warning.classList.remove("show");
 
-    /* ---------------------------------------------------
-       Enregistre la réservation localement, pour que le
-       système de disponibilité (voir AVAILABILITY plus bas)
-       puisse griser automatiquement la moto sur les pages
-       catalogue.html et index.html pendant ces dates.
-       --------------------------------------------------- */
     saveBooking(modelSelect.value, selectedRange.start, selectedRange.end);
 
-    /* ---------------------------------------------------
-       Envoi de la demande — même circuit que la boutique :
-       Telegram (automatique, silencieux) + WhatsApp + e-mail
-       (le client doit confirmer l'envoi de son côté pour ces
-       deux derniers, c'est une limite de WhatsApp/mailto, pas
-       du code).
-       --------------------------------------------------- */
     const summary = buildBookingSummaryText(form, modelSelect.value);
     sendTelegramNotification(summary);
 
@@ -709,7 +569,7 @@ function initBookingForm(){
 }
 
 /* =========================================================
-   6. CONTACT FORM (demo submit)
+   6. CONTACT FORM
    ========================================================= */
 function initContactForm(){
   const form = document.getElementById("contactForm");
@@ -731,7 +591,6 @@ function initFaqAccordion(){
     if (!question) return;
     question.addEventListener("click", () => {
       const wasOpen = item.classList.contains("open");
-      // close all others (single-open accordion)
       document.querySelectorAll(".faq-item.open").forEach(other => {
         if (other !== item) other.classList.remove("open");
       });
@@ -800,9 +659,6 @@ function initWhatsAppWidget(){
   updateWhatsAppLink();
 }
 
-/* =========================================================
-   MOMOVEN LINK
-   ========================================================= */
 function initMomovenLinks(){
   document.querySelectorAll(".momoven-link").forEach(link => {
     link.href = MOMOVEN_URL;
@@ -811,21 +667,6 @@ function initMomovenLinks(){
 
 /* =========================================================
    DISPONIBILITÉ AUTOMATIQUE DES MOTOS
-   ---------------------------------------------------------
-   Chaque réservation validée (voir initBookingForm ci-dessus)
-   est enregistrée dans le navigateur (localStorage). Sur les
-   pages catalogue.html et index.html, on vérifie au chargement
-   si la date du jour tombe dans une période déjà réservée pour
-   chaque modèle, et on grise automatiquement la carte + désactive
-   le bouton si c'est le cas — sans rien à faire manuellement.
-
-   ⚠️ Limite importante : ces réservations sont stockées dans LE
-   NAVIGATEUR de la personne qui réserve, pas sur un serveur
-   partagé. Donc ce système simule la disponibilité sur l'appareil
-   qui a fait la réservation (utile pour tester/démontrer), mais
-   ne synchronise PAS la disponibilité entre tous vos visiteurs.
-   Pour un vrai planning partagé entre tous les clients, il faudra
-   brancher une base de données en ligne (ex: Supabase, Firebase).
    ========================================================= */
 const BOOKINGS_KEY = "rent2ride_bookings";
 
@@ -844,23 +685,15 @@ function getBookings(){
   return JSON.parse(localStorage.getItem(BOOKINGS_KEY) || "[]");
 }
 
-/* Renvoie true si `model` est réservé à la date `date` (aujourd'hui par défaut) */
 function isModelBookedOn(model, date = new Date()){
   const d = toISO(date);
   return getBookings().some(b => b.model === model && d >= b.start && d <= b.end);
 }
 
-/* Renvoie true si `model` est indisponible, que ce soit parce qu'il
-   est dans PERMANENTLY_UNAVAILABLE, ou réservé à la date donnée.
-   C'est LA fonction à utiliser partout pour tester la disponibilité
-   d'un modèle — catalogue, compteur, et formulaire de réservation. */
 function isModelUnavailable(model, date = new Date()){
   return isModelPermanentlyUnavailable(model) || isModelBookedOn(model, date);
 }
 
-/* Met à jour l'affichage (badge + bouton) de toutes les cartes motos
-   présentes sur la page, selon les réservations enregistrées et la
-   liste PERMANENTLY_UNAVAILABLE. */
 function refreshAvailabilityBadges(){
   document.querySelectorAll(".bike-card[data-model]").forEach(card => {
     const model = card.dataset.model;
@@ -885,9 +718,6 @@ function refreshAvailabilityBadges(){
     }
   });
 
-  /* Boutons "Réserver ce modèle" du tableau comparateur (bas de
-     catalogue.html) : même logique, grisés/désactivés et non
-     cliquables si le modèle est indisponible. */
   document.querySelectorAll(".compare-table [data-model]").forEach(el => {
     const model = el.dataset.model;
     const unavailable = isModelUnavailable(model);
@@ -908,7 +738,6 @@ function refreshAvailabilityBadges(){
   });
 }
 
-/* Compteur global "X modèles disponibles aujourd'hui" (page Catalogue) */
 function updateAvailabilityCounter(){
   const el = document.getElementById("availabilityCounter");
   const cards = document.querySelectorAll(".bike-card[data-model]");
@@ -921,8 +750,6 @@ function updateAvailabilityCounter(){
   el.textContent = template.replace("{n}", available).replace("{total}", cards.length);
 }
 
-/* Optionnel : permet de vider les réservations de test depuis la
-   console du navigateur (F12) en tapant : clearAllBookings() */
 function clearAllBookings(){
   localStorage.removeItem(BOOKINGS_KEY);
   refreshAvailabilityBadges();
@@ -931,42 +758,8 @@ function clearAllBookings(){
 
 /* =========================================================
    10. BOUTIQUE — PANIER (SHOPPING CART)
-   ---------------------------------------------------------
-   Catalogue produit ci-dessous : c'est LA seule source de vérité
-   pour les prix. Pour changer un prix ou ajouter un produit,
-   modifiez uniquement cet objet SHOP_PRODUCTS.
-
-   Le panier est stocké en localStorage (comme les réservations
-   plus haut) : il persiste pour un même visiteur/navigateur, mais
-   n'est PAS partagé entre appareils ni synchronisé sur un serveur.
-
-   ⚠️ PAIEMENT EN LIGNE : il n'y a pas encore de paiement par carte
-   bancaire branché ici (Stripe, PayPal...). C'est volontaire : un
-   vrai paiement carte nécessite un petit serveur (Stripe Checkout
-   Session côté back-end) qu'on ne peut pas faire de façon sécurisée
-   en pur HTML/JS statique sur GitHub Pages. Le circuit actuel
-   (WhatsApp / e-mail) permet de prendre des commandes réelles dès
-   maintenant. Quand vous serez prêt à brancher Stripe, il faudra :
-   1. Un compte Stripe + une petite fonction serverless
-      (Vercel/Netlify Functions, Supabase Edge Function...)
-      qui crée une "Checkout Session" à partir du panier envoyé.
-   2. Remplacer la fonction handleCheckoutSubmit() ci-dessous par un
-      fetch() vers cette fonction, puis rediriger vers l'URL Stripe
-      retournée (session.url).
-   Le repère "STRIPE INTEGRATION POINT" ci-dessous marque l'endroit exact.
    ========================================================= */
-
-/* =========================================================
-   BONS CADEAUX — suivi de solde automatisé (Airtable + proxy)
-   ---------------------------------------------------------
-   Une fois le Cloudflare Worker déployé (voir /cloudflare-worker
-   dans le projet), collez ici son URL, par exemple :
-   window.GIFTCARD_API_BASE = "https://rent2ride-giftcards.VOTRE-SOUS-DOMAINE.workers.dev";
-   Tant que cette ligne reste vide/commentée, les bons cadeaux
-   continuent à fonctionner comme avant (commande simple envoyée
-   par WhatsApp/e-mail/Telegram), juste sans code ni suivi de solde.
-   ========================================================= */
-window.GIFTCARD_API_BASE = "https://rent2ride-giftcards.sch-eric-es.workers.dev"; // Worker Cloudflare configuré et testé le 14/08/2026
+window.GIFTCARD_API_BASE = "https://rent2ride-giftcards.sch-eric-es.workers.dev";
 
 const SHOP_PRODUCTS = {
   tshirt: {
@@ -998,30 +791,14 @@ const SHOP_PRODUCTS = {
     colors: null,
   },
   giftcard: {
-    price: null, // prix variable, voir la fonction addToCart
+    price: null,
     nameKey: "prod_giftcard_name",
     descKey: "prod_giftcard_desc",
-    sizes: ["50", "100", "150"], // représente le montant en euros, pas une taille
+    sizes: ["50", "100", "150"],
     colors: null,
   },
 };
 
-/* =========================================================
-   STOCK DE DISPONIBILITÉ
-   ---------------------------------------------------------
-   C'est ICI que vous gérez le stock. Chaque ligne correspond à
-   une combinaison produit + taille + couleur (mettez "-" pour
-   les produits sans taille ou sans couleur). Le nombre est la
-   quantité restante en stock.
-
-   ⚠️ Ce stock est un simple compteur affiché sur le site — il
-   n'est PAS décrémenté automatiquement quand une commande arrive
-   par WhatsApp/e-mail (il n'y a pas de base de données derrière).
-   Après chaque vente réelle, pensez à revenir ici et à baisser le
-   chiffre à la main pour que le site reste à jour. Le seul rôle
-   du code JS est d'empêcher un client d'ajouter au panier plus
-   d'exemplaires que ce qui est indiqué ci-dessous.
-   ========================================================= */
 const SHOP_STOCK = {
   "tshirt|S|black": 6,   "tshirt|S|white": 5,   "tshirt|S|red": 4,   "tshirt|S|grey": 4,
   "tshirt|M|black": 8,   "tshirt|M|white": 7,   "tshirt|M|red": 6,   "tshirt|M|grey": 6,
@@ -1041,28 +818,8 @@ const SHOP_STOCK = {
 };
 
 const STOCK_LOW_THRESHOLD = 3;
-
-/* =========================================================
-   BOUTIQUE OUVERTE / FERMÉE
-   ---------------------------------------------------------
-   Interrupteur global : tant que SHOP_OPEN vaut false, les articles
-   physiques (t-shirt, sweat, casquette, stickers) s'affichent comme
-   indisponibles et leurs boutons "Ajouter au panier" sont désactivés
-   — quel que soit le stock réel indiqué dans SHOP_STOCK ci-dessus.
-   Le BON CADEAU fait exception : il reste toujours en vente, même
-   quand SHOP_OPEN est à false (voir updateStockDisplay plus bas).
-   Pour rouvrir toute la boutique aux clients, repassez simplement
-   SHOP_OPEN à true.
-   ========================================================= */
 const SHOP_OPEN = false;
 
-/* =========================================================
-   CALCULATEUR DE PRIX (page Nos offres)
-   ---------------------------------------------------------
-   Reprend les mêmes paliers que les 6 formules affichées plus bas.
-   Si vous changez un prix de formule dans le HTML, pensez à
-   changer aussi le chiffre correspondant ici pour rester cohérent.
-   ========================================================= */
 const PRICE_TIERS = [
   { days: 1,  price: 89  },
   { days: 2,  price: 169 },
@@ -1105,14 +862,6 @@ function initPriceCalculator(){
   render();
 }
 
-/* =========================================================
-   PHOTOS PRODUIT — par couleur + vue (recto/verso)
-   ---------------------------------------------------------
-   Pour ajouter/remplacer une photo : mettez le fichier dans
-   images/ puis indiquez son chemin ici. Laissez `back: null`
-   tant que vous n'avez pas de photo de dos — le bouton "Verso"
-   ne s'affichera tout simplement pas pour ce produit/couleur.
-   ========================================================= */
 const SHOP_IMAGES = {
   tshirt: {
     black: { front: "./images/shop-tshirt-black-front.jpg", back: "./images/shop-tshirt-black-back.jpg" },
@@ -1127,8 +876,6 @@ const SHOP_IMAGES = {
     grey:  { front: "./images/shop-hoodie-grey-front.jpg",  back: "./images/shop-hoodie-grey-back.jpg" },
   },
   cap: {
-    /* Pas de photo de dos pour la casquette pour l'instant -> back: null,
-       le bouton "Verso" restera simplement masqué pour ce produit. */
     black: { front: "./images/shop-cap-black-front.jpg", back: null },
     white: { front: "./images/shop-cap-white-front.jpg", back: null },
     red:   { front: "./images/shop-cap-red-front.jpg",   back: null },
@@ -1137,8 +884,6 @@ const SHOP_IMAGES = {
   stickers: {},
 };
 
-/* Photo affichée par défaut tant que la photo spécifique à la
-   couleur (ci-dessus) n'existe pas encore sur le serveur. */
 const SHOP_IMAGE_FALLBACK = {
   tshirt: "./images/shop-tshirt-black-front.jpg",
   hoodie: "./images/shop-hoodie-black-front.jpg",
@@ -1152,8 +897,6 @@ function getStockFor(productId, size, color){
   return typeof val === "number" ? val : 0;
 }
 
-/* Stock restant compte tenu de ce qui est déjà dans le panier
-   du visiteur (pour éviter qu'il n'ajoute plus que ce qui existe). */
 function getStockRemaining(productId, size, color){
   const total = getStockFor(productId, size, color);
   const lineId = cartLineId(productId, size, color);
@@ -1173,9 +916,6 @@ function saveCart(cart){
   updateCartBadge();
 }
 
-/* Un item de panier est identifié par produit + taille + couleur,
-   pour que "T-shirt M noir" et "T-shirt L blanc" restent des lignes
-   distinctes même si c'est le même produit de base. */
 function cartLineId(productId, size, color){
   return [productId, size || "-", color || "-"].join("|");
 }
@@ -1183,9 +923,6 @@ function cartLineId(productId, size, color){
 function addToCart(productId, size, color, qty = 1){
   const product = SHOP_PRODUCTS[productId];
   if (!product) return;
-  /* Cas particulier : le bon cadeau a un prix variable selon le montant
-     choisi (porté par le "size", ex. "50" / "100" / "150") plutôt qu'un
-     prix fixe comme les autres produits. */
   const price = productId === "giftcard" ? parseInt(size, 10) : product.price;
   const cart = getCart();
   const lineId = cartLineId(productId, size, color);
@@ -1244,7 +981,7 @@ function renderCartDrawer(){
   const list = document.getElementById("cartItems");
   const emptyEl = document.getElementById("cartEmpty");
   const footerEl = document.getElementById("cartFooter");
-  if (!list) return; /* le tiroir panier n'existe pas sur cette page */
+  if (!list) return;
 
   const cart = getCart();
   const lang = getCurrentLang();
@@ -1287,7 +1024,7 @@ function renderCartDrawer(){
     row.querySelector('[data-action="inc"]').addEventListener("click", () => {
       if (item.productId !== "giftcard"){
         const totalStock = getStockFor(item.productId, item.size, item.color);
-        if (item.qty + 1 > totalStock) return; /* on ne dépasse pas le stock */
+        if (item.qty + 1 > totalStock) return;
       }
       updateCartLineQty(item.lineId, item.qty + 1);
     });
@@ -1357,7 +1094,6 @@ async function createGiftCardsForCart(cart, name, email){
 
   const codes = [];
   for (const item of giftItems){
-    // Un code distinct par unité (qty) — chaque bon cadeau a son propre solde.
     for (let i = 0; i < item.qty; i++){
       try {
         const res = await fetch(`${window.GIFTCARD_API_BASE}/create`, {
@@ -1369,10 +1105,7 @@ async function createGiftCardsForCart(cart, name, email){
           const data = await res.json();
           codes.push({ amount: data.amount, code: data.code });
         }
-      } catch (err){
-        // On n'empêche pas la commande de partir si la création du code échoue
-        // (ex. Worker non configuré/hors ligne) — juste pas de code inclus.
-      }
+      } catch (err){}
     }
   }
   return codes;
@@ -1404,9 +1137,6 @@ async function handleCheckoutSubmit(){
 
   if (sendBtn) sendBtn.disabled = true;
 
-  // Si le panier contient un ou plusieurs bons cadeaux ET que le Worker
-  // est configuré (GIFTCARD_API_BASE), on génère leur(s) code(s) avant
-  // d'envoyer la commande, pour pouvoir les inclure dans le récapitulatif.
   const giftCodes = await createGiftCardsForCart(cart, name, email);
 
   let summary = buildOrderSummaryText(name, contact, address, note);
@@ -1417,29 +1147,11 @@ async function handleCheckoutSubmit(){
 
   if (sendBtn) sendBtn.disabled = false;
 
-  /* ============ STRIPE INTEGRATION POINT ============
-     Ici, à terme, on remplacera le code WhatsApp/e-mail ci-dessous
-     par quelque chose comme :
-
-     const res = await fetch("https://votre-backend/create-checkout-session", {
-       method: "POST",
-       headers: { "Content-Type": "application/json" },
-       body: JSON.stringify({ cart: getCart(), name, email, phone, address, note })
-     });
-     const session = await res.json();
-     window.location.href = session.url; // redirige vers le paiement Stripe
-     ===================================================== */
-
-  /* 1. Notifie automatiquement le groupe Telegram — aucune action du
-        client requise, ça part tout seul en arrière-plan. */
   sendTelegramNotification(summary);
 
-  /* 2. Ouvre WhatsApp dans un nouvel onglet avec le récap pré-rempli */
   const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(summary)}`;
   window.open(waUrl, "_blank", "noopener");
 
-  /* 3. Prépare l'e-mail — léger délai pour laisser le temps à l'onglet
-        WhatsApp de s'ouvrir avant de faire naviguer l'onglet actuel */
   const subject = encodeURIComponent("Commande boutique Rent2Ride");
   const body = encodeURIComponent(summary);
   const mailtoUrl = `mailto:info@rent2ride.com?subject=${subject}&body=${body}`;
@@ -1506,10 +1218,6 @@ function updateStockDisplay(card){
   if (!badge || !addBtn) return;
   const lang = getCurrentLang();
 
-  /* Boutique fermée : ceci s'applique à tous les articles SAUF le bon
-     cadeau, qui reste en vente même quand le reste de la boutique est
-     fermé (voir GIFTCARD_ALWAYS_OPEN ci-dessous, avec SHOP_STOCK plus
-     haut). */
   if (!SHOP_OPEN && productId !== "giftcard"){
     badge.textContent = TRANSLATIONS.shop_closed[lang];
     badge.classList.remove("stock-in", "stock-low");
@@ -1519,8 +1227,6 @@ function updateStockDisplay(card){
     return;
   }
 
-  /* Les bons cadeaux n'ont pas de stock physique -> pas de badge,
-     toujours disponibles. Le prix affiché suit le montant choisi. */
   if (productId === "giftcard"){
     badge.textContent = "";
     badge.classList.remove("stock-in", "stock-low", "stock-out");
@@ -1561,14 +1267,13 @@ function initShopProductCards(){
     const addBtn = card.querySelector(".product-add");
     if (!addBtn) return;
 
-    /* Recalcule le stock affiché à chaque changement de taille/couleur */
     card.querySelectorAll('input[type="radio"]').forEach(input => {
       input.addEventListener("change", () => updateStockDisplay(card));
     });
     updateStockDisplay(card);
 
     addBtn.addEventListener("click", () => {
-      if (!SHOP_OPEN && productId !== "giftcard") return; // boutique fermée : sécurité en plus du bouton désactivé (le bon cadeau reste en vente)
+      if (!SHOP_OPEN && productId !== "giftcard") return;
 
       const { size, color } = getSelectedVariant(card, productId);
       if (productId !== "giftcard"){
@@ -1598,38 +1303,24 @@ function initShopProductCards(){
 
 const COOKIE_CONSENT_KEY = "rent2ride_cookie_consent";
 
-/* =========================================================
-   PARALLAX — vidéo de fond de l'accueil
-   ---------------------------------------------------------
-   Le parallax CSS (background-attachment:fixed) gère déjà les
-   bandeaux images de toutes les pages intérieures. La vidéo de
-   fond de l'accueil a besoin d'un petit coup de pouce JS, car
-   cette technique CSS ne fonctionne pas sur une balise <video>.
-   ========================================================= */
 function initVideoParallax(){
   const video = document.querySelector(".hero-video-bg");
   const section = document.querySelector(".hero-video-section");
   if (!video || !section) return;
 
-  // Filet de sécurité : tant qu'aucun fichier hero-video.mp4 n'existe
-  // (ou en cas d'erreur de chargement), on masque la balise <video> —
-  // le carrousel de photos existant reste visible à la place, exactement
-  // comme avant l'ajout de la vidéo. Dès que le fichier est présent et
-  // se charge correctement, la vidéo prend automatiquement le relais.
   video.addEventListener("error", () => { video.style.display = "none"; }, true);
   if (video.readyState === 0 && video.networkState === 3){
     video.style.display = "none";
   }
 
-  if (window.matchMedia("(max-width: 900px)").matches) return; // désactivé sur mobile
+  if (window.matchMedia("(max-width: 900px)").matches) return;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
   let ticking = false;
   function update(){
     const rect = section.getBoundingClientRect();
-    // Ne calcule que tant que la section est visible à l'écran (perf)
     if (rect.bottom > 0 && rect.top < window.innerHeight){
-      const offset = rect.top * 0.25; // la vidéo suit le défilement à 25% de la vitesse
+      const offset = rect.top * 0.25;
       video.style.transform = `translateY(${-offset}px) scale(1.15)`;
     }
     ticking = false;
@@ -1677,7 +1368,7 @@ function initRidePlanner(){
   const countEl = document.getElementById("plannerCount");
   const kmEl = document.getElementById("plannerKm");
   const daysEl = document.getElementById("plannerDays");
-  const HOURS_PER_DAY = 4.5; // temps de route raisonnable par jour, hors pauses
+  const HOURS_PER_DAY = 4.5;
 
   function render(){
     let totalKm = 0, totalHours = 0, count = 0;
@@ -1731,16 +1422,6 @@ function initReferralTool(){
   }
 }
 
-/* =========================================================
-   WIDGET MÉTÉO — page d'accueil
-   ---------------------------------------------------------
-   Gratuit sur openweathermap.org (aucune carte bancaire requise) :
-   1. Créez un compte sur openweathermap.org
-   2. Onglet "API keys" -> copiez la clé générée automatiquement
-   3. Collez-la ci-dessous. Une clé toute neuve met parfois 1-2h
-      à s'activer (erreur 401 en attendant, normal).
-   Tant que la clé est vide, le widget reste simplement masqué.
-   ========================================================= */
 const WEATHER_API_KEY = "d1e8dd02ae4676330f60c4067310e5b7";
 const WEATHER_CITY = "Malaga,ES";
 
@@ -1752,7 +1433,7 @@ function initWeatherWidget(){
     .then(res => res.ok ? res.json() : Promise.reject(res.status))
     .then(data => {
       const temp = Math.round(data.main.temp);
-      const code = data.weather[0].main; // Clear, Clouds, Rain, etc.
+      const code = data.weather[0].main;
       const icons = { Clear: "☀️", Clouds: "☁️", Rain: "🌧️", Drizzle: "🌦️", Thunderstorm: "⛈️", Snow: "❄️", Mist: "🌫️", Fog: "🌫️", Haze: "🌫️" };
       document.getElementById("weatherIcon").textContent = icons[code] || "☀️";
       document.getElementById("weatherTemp").textContent = `${temp}°C`;
@@ -1761,13 +1442,6 @@ function initWeatherWidget(){
     .catch(() => { widget.style.display = "none"; });
 }
 
-/* =========================================================
-   CRÉNEAUX HORAIRES DE COLLECTE / RETOUR
-   ---------------------------------------------------------
-   Créneaux standards 9h-20h, pas de 1h. Choisir "Hors créneaux
-   standards" applique un supplément fixe (OFF_HOURS_FEE) —
-   modifiable ci-dessous.
-   ========================================================= */
 const STANDARD_HOURS = { start: 9, end: 20 };
 const OFF_HOURS_FEE = 20;
 
@@ -1779,7 +1453,7 @@ function populateTimeSelect(selectEl, lang){
     const opt = document.createElement("option");
     opt.value = label;
     opt.textContent = label;
-    if (h === 10) opt.selected = true; // creneau par defaut
+    if (h === 10) opt.selected = true;
     selectEl.appendChild(opt);
   }
   const offOpt = document.createElement("option");
@@ -1799,9 +1473,6 @@ function initBookingTimeSlots(){
   [pickupSelect, returnSelect].forEach(sel => sel.addEventListener("change", updateBookingSummary));
 }
 
-/* =========================================================
-   NEWSLETTER — soumission Formspree en AJAX (sans rechargement)
-   ---------------------------------------------------------*/
 function initNewsletterForm(){
   document.querySelectorAll(".newsletter-form").forEach(form => {
     form.addEventListener("submit", async (e) => {
@@ -1874,6 +1545,24 @@ function initCart(){
   updateCartBadge();
 }
 
+// Gestion dynamique de la bannière des inclusions
+function updateInclusBanner(lang) {
+  const bannerImg = document.getElementById('inclusBanner');
+  if (!bannerImg) return;
+  
+  if (lang === 'esp' || lang === 'es' || lang === 'ES') {
+    bannerImg.src = './images/inclus-locations-banner-esp.jpg';
+    bannerImg.alt = 'Incluido en todos los alquileres';
+  } else if (lang === 'ang' || lang === 'en' || lang === 'EN') {
+    bannerImg.src = './images/inclus-locations-banner-ang.jpg';
+    bannerImg.alt = 'Included in all rentals';
+  } else {
+    bannerImg.src = './images/inclus-locations-banner-fr.jpg';
+    bannerImg.alt = 'Inclus dans toutes les locations';
+  }
+}
+
+// Initialisation globale au chargement du DOM
 document.addEventListener("DOMContentLoaded", () => {
   initLangSwitcher();
   initMobileNav();
@@ -1889,8 +1578,10 @@ document.addEventListener("DOMContentLoaded", () => {
   initWhatsAppWidget();
   initMomovenLinks();
   initBikeGalleries();
-updateClubBanner(currentLang); 
-updateInclusBanner(currentLang);
+  
+  if (typeof updateClubBanner === "function") updateClubBanner(currentLang);
+  updateInclusBanner(currentLang);
+
   refreshAvailabilityBadges();
   if (typeof updateAvailabilityCounter === "function") updateAvailabilityCounter();
   initCart();
@@ -1902,31 +1593,11 @@ updateInclusBanner(currentLang);
   initRidePlanner();
   initReferralTool();
   initWeatherWidget();
-  initBikeGalleries();
 });
 
-/* Enregistrement du service worker — rend le site "installable"
-   (PWA) sur mobile et ordinateur. Sans incidence si le navigateur
-   ne le supporte pas. */
+// Enregistrement du service worker
 if ("serviceWorker" in navigator){
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("./js/sw.js", { scope: "./" }).catch(() => {});
   });
-}
-// --- Mise à jour dynamique de la bannière des inclusions ---
-function updateInclusBanner(lang) {
-  console.log("Langue reçue par la bannière :", lang); // <--- Ligne de test
-  const bannerImg = document.getElementById('inclusBanner');
-  if (!bannerImg) return;
-  
-  if (lang === 'esp' || lang === 'es' || lang === 'ES') {
-    bannerImg.src = './images/inclus-locations-banner-esp.jpg';
-    bannerImg.alt = 'Incluido en todos los alquileres';
-  } else if (lang === 'ang' || lang === 'en' || lang === 'EN') {
-    bannerImg.src = './images/inclus-locations-banner-ang.jpg';
-    bannerImg.alt = 'Included in all rentals';
-  } else {
-    bannerImg.src = './images/inclus-locations-banner-fr.jpg';
-    bannerImg.alt = 'Inclus dans toutes les locations';
-  }
 }
