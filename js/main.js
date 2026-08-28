@@ -163,6 +163,7 @@ function applyTranslations(lang){
       el.textContent = entry[lang];
     }
   });
+updateClubBanner(lang);
 
   document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
     const key = el.getAttribute("data-i18n-placeholder");
@@ -1887,4 +1888,20 @@ if ("serviceWorker" in navigator){
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("./js/sw.js", { scope: "./" }).catch(() => {});
   });
+}
+// --- Mise à jour dynamique de la bannière du Club Rent2Ride ---
+function updateClubBanner(lang) {
+  const bannerImg = document.getElementById('clubBanner');
+  if (bannerImg) {
+    if (lang === 'es') {
+      bannerImg.src = './images/rent2ride-club-banner-esp.jpg';
+      bannerImg.alt = 'Rent2Ride Club Banner - ES';
+    } else if (lang === 'en') {
+      bannerImg.src = './images/rent2ride-club-banner-ang.jpg';
+      bannerImg.alt = 'Rent2Ride Club Banner - EN';
+    } else {
+      bannerImg.src = './images/rent2ride-club-banner-fr.jpg';
+      bannerImg.alt = 'Rent2Ride Club Banner - FR';
+    }
+  }
 }
