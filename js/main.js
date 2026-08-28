@@ -153,7 +153,7 @@ function getCurrentLang(){
   return LANGS.includes(nav) ? nav : "fr";
 }
 
-unction applyTranslations(lang){
+function applyTranslations(lang){
     document.documentElement.lang = lang;
 
     document.querySelectorAll("[data-i18n]").forEach(el => {
@@ -214,7 +214,7 @@ updateClubBanner(lang);
   // Ajoutez vos bannières ici :
   updateClubBanner(lang);
   updateInclusBanner(lang);
-}
+
 
 function setLang(lang){
   if (!LANGS.includes(lang)) return;
