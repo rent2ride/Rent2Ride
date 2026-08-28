@@ -1165,4 +1165,16 @@ packs_sub_2: {
   map_hint: { fr: "Cliquez un tracé pour voir le détail de la balade",
               es: "Haga clic en una ruta para ver el detalle del recorrido",
               en: "Click a route to see the ride details" }
+              
 };
+
+const clubBanner = document.getElementById('clubBanner');
+if (clubBanner) {
+  if (currentLang === 'es') {
+    clubBanner.src = './images/rent2ride-club-banner-esp.jpg';
+  } else if (currentLang === 'en') {
+    clubBanner.src = './images/rent2ride-club-banner-ang.jpg';
+  } else {
+    clubBanner.src = './images/rent2ride-club-banner-fr.jpg';
+  }
+}
