@@ -534,16 +534,10 @@ const TRANSLATIONS = {
 
   packs_eyebrow:   { fr: "NOS OFFRES", es: "NUESTRAS OFERTAS", en: "OUR OFFERS" },
   packs_title:     { fr: "La liberté de rouler, sans limite", es: "La libertad de rodar, sin límites", en: "Ride More. Worry Less." },
-  packs_sub: { 
-  fr: "Toutes les tarifs sont indicatifs pour la Yamaha MT-07", 
-  es: "Todas las tarifas son orientativas para la Yamaha MT-07", 
-  en: "All rates are indicative for the Yamaha MT-07" 
-},
-packs_sub_2: { 
-  fr: "Ajustés selon le modèle choisi.", 
-  es: "Ajustadas según el modelo elegido.", 
-  en: "Adjusted depending on the model chosen." 
-},
+  packs_sub:       { fr: "Kilométrage illimité sur toutes nos motos. Tarifs transparents, sans frais cachés. Choisissez la formule qui correspond à votre aventure.",
+                     es: "Kilómetros ilimitados en todas nuestras motos. Tarifas transparentes, sin cargos ocultos. Elija la fórmula que se adapte a su aventura.",
+                     en: "Unlimited mileage on all our bikes. Transparent pricing, no hidden fees. Choose the formula that fits your adventure." },
+
   pack_popular:    { fr: "Le plus populaire", es: "El más popular", en: "Most popular" },
   pack_best:       { fr: "Meilleur rapport qualité/prix", es: "Mejor relación calidad/precio", en: "Best value" },
   pack_from:       { fr: "À partir de", es: "Desde", en: "From" },
@@ -1165,16 +1159,73 @@ packs_sub_2: {
   map_hint: { fr: "Cliquez un tracé pour voir le détail de la balade",
               es: "Haga clic en una ruta para ver el detalle del recorrido",
               en: "Click a route to see the ride details" }
-              
-};
+  ,
 
-const clubBanner = document.getElementById('clubBanner');
-if (clubBanner) {
-  if (currentLang === 'es') {
-    clubBanner.src = './images/rent2ride-club-banner-esp.jpg';
-  } else if (currentLang === 'en') {
-    clubBanner.src = './images/rent2ride-club-banner-ang.jpg';
-  } else {
-    clubBanner.src = './images/rent2ride-club-banner-fr.jpg';
-  }
-}
+  /* ---------------- Balades Catalogne (balades.html — cartes 8 à 12) ---------------- */
+  rides_barcelona_divider: { fr: "Autour de Barcelone", es: "Alrededor de Barcelona", en: "Around Barcelona" },
+
+  r8_name: { fr: "Montserrat (BV-1101)", es: "Montserrat (BV-1101)", en: "Montserrat (BV-1101)" },
+  r8_tag: { fr: "Le sanctuaire suspendu au-dessus de Barcelone", es: "El santuario suspendido sobre Barcelona", en: "The sanctuary suspended above Barcelona" },
+  r8_dist: { fr: "90 km", es: "90 km", en: "90 km" },
+  r8_dur: { fr: "2h – 3h", es: "2h – 3h", en: "2h – 3h" },
+  r8_diff: { fr: "Modéré", es: "Moderado", en: "Moderate" },
+  r8_desc: { fr: "Depuis Barcelone, la BV-1101 grimpe en lacets serrés vers le monastère bénédictin de Montserrat, perché sur des formations rocheuses spectaculaires. Une sortie courte mais intense, à moins d'une heure de la ville.",
+             es: "Desde Barcelona, la BV-1101 sube en curvas cerradas hacia el monasterio benedictino de Montserrat, encaramado sobre formaciones rocosas espectaculares. Una salida corta pero intensa, a menos de una hora de la ciudad.",
+             en: "From Barcelona, the BV-1101 climbs in tight hairpins toward the Benedictine monastery of Montserrat, perched on spectacular rock formations. A short but intense ride, less than an hour from the city." },
+  r8_h1: { fr: "Vue sur les aiguilles rocheuses de Montserrat", es: "Vistas de las agujas rocosas de Montserrat", en: "Views of Montserrat's rock spires" },
+  r8_h2: { fr: "Monastère bénédictin millénaire", es: "Monasterio benedictino milenario", en: "Thousand-year-old Benedictine monastery" },
+  r8_h3: { fr: "Lacets serrés sur la BV-1101", es: "Curvas cerradas en la BV-1101", en: "Tight hairpins on the BV-1101" },
+  r8_bike: { fr: "Idéale avec : MT-07, Tracer 7", es: "Ideal con: MT-07, Tracer 7", en: "Ideal with: MT-07, Tracer 7" },
+
+  r9_name: { fr: "La Costa Brava et ses mille virages (GI-682)", es: "La Costa Brava y sus mil curvas (GI-682)", en: "The Costa Brava and its thousand bends (GI-682)" },
+  r9_tag: { fr: "La route la plus sinueuse de Catalogne", es: "La carretera más sinuosa de Cataluña", en: "Catalonia's most winding road" },
+  r9_dist: { fr: "140 km", es: "140 km", en: "140 km" },
+  r9_dur: { fr: "3h30 – 5h", es: "3h30 – 5h", en: "3h30 – 5h" },
+  r9_diff: { fr: "Sportif", es: "Deportivo", en: "Sporty" },
+  r9_desc: { fr: "La GI-682 longe les falaises de la Costa Brava entre Palafrugell et Cadaqués, enchaînant virage sur virage au-dessus de criques secrètes. Une route technique qui demande de la concentration.",
+             es: "La GI-682 bordea los acantilados de la Costa Brava entre Palafrugell y Cadaqués, encadenando curva tras curva sobre calas secretas. Una carretera técnica que exige concentración.",
+             en: "The GI-682 hugs the Costa Brava cliffs between Palafrugell and Cadaqués, stringing bend after bend above secret coves. A technical road that demands focus." },
+  r9_h1: { fr: "Ports de Llafranc, Calella de Palafrugell et Tamariu", es: "Puertos de Llafranc, Calella de Palafrugell y Tamariu", en: "The ports of Llafranc, Calella de Palafrugell and Tamariu" },
+  r9_h2: { fr: "Falaises et criques sauvages", es: "Acantilados y calas salvajes", en: "Cliffs and wild coves" },
+  r9_h3: { fr: "Cadaqués et son village de pêcheurs", es: "Cadaqués y su pueblo de pescadores", en: "Cadaqués and its fishing village" },
+  r9_bike: { fr: "Idéale avec : Tracer 7, MT-09", es: "Ideal con: Tracer 7, MT-09", en: "Ideal with: Tracer 7, MT-09" },
+
+  r10_name: { fr: "Le parc naturel du Montseny", es: "El parque natural del Montseny", en: "Montseny Natural Park" },
+  r10_tag: { fr: "Forêts et petits cols à moins d'une heure de Barcelone", es: "Bosques y pequeños puertos a menos de una hora de Barcelona", en: "Forests and small passes less than an hour from Barcelona" },
+  r10_dist: { fr: "100 km", es: "100 km", en: "100 km" },
+  r10_dur: { fr: "2h30 – 3h30", es: "2h30 – 3h30", en: "2h30 – 3h30" },
+  r10_diff: { fr: "Modéré", es: "Moderado", en: "Moderate" },
+  r10_desc: { fr: "À moins de 70 km du centre de Barcelone, le Montseny alterne routes forestières et petits cols entre les comarques du Vallès, de l'Osona et de la Selva. Un vrai dépaysement montagneux sans partir loin.",
+              es: "A menos de 70 km del centro de Barcelona, el Montseny alterna carreteras forestales y pequeños puertos entre las comarcas del Vallès, Osona y La Selva. Un verdadero cambio de aires de montaña sin ir muy lejos.",
+              en: "Less than 70 km from central Barcelona, the Montseny alternates forest roads and small passes across the Vallès, Osona and Selva areas. A real mountain escape without going far." },
+  r10_h1: { fr: "Forêts de hêtres et de châtaigniers", es: "Bosques de hayas y castaños", en: "Beech and chestnut forests" },
+  r10_h2: { fr: "Village de Seva, ville natale d'Àlex Crivillé", es: "Pueblo de Seva, ciudad natal de Àlex Crivillé", en: "Seva village, hometown of Àlex Crivillé" },
+  r10_h3: { fr: "Petits cols peu fréquentés", es: "Pequeños puertos poco frecuentados", en: "Quiet, lightly-trafficked passes" },
+  r10_bike: { fr: "Idéale avec : MT-07, Tracer 7", es: "Ideal con: MT-07, Tracer 7", en: "Ideal with: MT-07, Tracer 7" },
+
+  r11_name: { fr: "La côte du Garraf et Sitges", es: "La costa del Garraf y Sitges", en: "The Garraf coast and Sitges" },
+  r11_tag: { fr: "Corniche littorale et villages viticoles", es: "Corniche litoral y pueblos vinícolas", en: "Coastal corniche and wine villages" },
+  r11_dist: { fr: "85 km", es: "85 km", en: "85 km" },
+  r11_dur: { fr: "2h – 3h", es: "2h – 3h", en: "2h – 3h" },
+  r11_diff: { fr: "Facile", es: "Fácil", en: "Easy" },
+  r11_desc: { fr: "Au sud de Barcelone, cet itinéraire combine petites routes sinueuses vers l'intérieur (Molins de Rei, Gelida) et corniche littorale jusqu'à Vilanova i la Geltrú et Sitges. Un bon compromis entre virages et arrêts plage.",
+              es: "Al sur de Barcelona, este itinerario combina pequeñas carreteras sinuosas hacia el interior (Molins de Rei, Gelida) y corniche litoral hasta Vilanova i la Geltrú y Sitges. Un buen equilibrio entre curvas y paradas en la playa.",
+              en: "South of Barcelona, this route combines winding inland roads (Molins de Rei, Gelida) with a coastal corniche down to Vilanova i la Geltrú and Sitges. A good balance of bends and beach stops." },
+  r11_h1: { fr: "Vignobles du Penedès en arrière-plan", es: "Viñedos del Penedès de fondo", en: "Penedès vineyards in the background" },
+  r11_h2: { fr: "Corniche du Garraf face à la mer", es: "Corniche del Garraf frente al mar", en: "The Garraf corniche facing the sea" },
+  r11_h3: { fr: "Village de Sitges et ses plages", es: "Pueblo de Sitges y sus playas", en: "Sitges village and its beaches" },
+  r11_bike: { fr: "Idéale avec : MT-07, MT-09", es: "Ideal con: MT-07, MT-09", en: "Ideal with: MT-07, MT-09" },
+
+  r12_name: { fr: "Barcelone – Andorre", es: "Barcelona – Andorra", en: "Barcelona – Andorra" },
+  r12_tag: { fr: "L'aller-retour montagne à la journée", es: "La ida y vuelta de montaña en un día", en: "The day-trip mountain round-trip" },
+  r12_dist: { fr: "350 km", es: "350 km", en: "350 km" },
+  r12_dur: { fr: "6h – 8h", es: "6h – 8h", en: "6h – 8h" },
+  r12_diff: { fr: "Sportif", es: "Deportivo", en: "Sporty" },
+  r12_desc: { fr: "Direction les Pyrénées : cet aller-retour vers Andorre traverse Manresa et La Seu d'Urgell avant de grimper vers les cols andorrans. Une vraie sortie montagne, à réserver aux pilotes expérimentés ou à scinder en deux jours.",
+              es: "Dirección los Pirineos: esta ida y vuelta hacia Andorra atraviesa Manresa y La Seu d'Urgell antes de subir hacia los puertos andorranos. Una verdadera salida de montaña, reservada a pilotos experimentados o para dividir en dos días.",
+              en: "Heading for the Pyrenees: this round-trip to Andorra crosses Manresa and La Seu d'Urgell before climbing toward the Andorran passes. A real mountain ride, best for experienced riders or split over two days." },
+  r12_h1: { fr: "Cols pyrénéens", es: "Puertos pirenaicos", en: "Pyrenean mountain passes" },
+  r12_h2: { fr: "La Seu d'Urgell et ses gorges", es: "La Seu d'Urgell y sus desfiladeros", en: "La Seu d'Urgell and its gorges" },
+  r12_h3: { fr: "Andorre-la-Vieille en altitude", es: "Andorra la Vella en altitud", en: "Andorra la Vella at altitude" },
+  r12_bike: { fr: "Idéale avec : Tracer 9, MT-09", es: "Ideal con: Tracer 9, MT-09", en: "Ideal with: Tracer 9, MT-09" }
+};
