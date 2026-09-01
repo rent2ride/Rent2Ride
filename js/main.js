@@ -1562,6 +1562,27 @@ function updateInclusBanner(lang) {
   }
 }
 
+/* BUG CORRIGÉ (26/08) : cette fonction était appelée à deux endroits
+   (initLangSwitcher + setLang) mais n'avait jamais été écrite. La
+   bannière Rent2Ride Club sur site-complet.html restait donc bloquée
+   en français quelle que soit la langue choisie, sans aucune erreur
+   visible dans la console (à cause du garde "typeof === function"). */
+function updateClubBanner(lang) {
+  const bannerImg = document.getElementById('clubBanner');
+  if (!bannerImg) return;
+
+  if (lang === 'esp' || lang === 'es' || lang === 'ES') {
+    bannerImg.src = './images/rent2ride-club-banner-esp.jpg';
+    bannerImg.alt = 'Motorista equipado Rent2Ride, pulgar arriba, en una carretera costera al atardecer — Rent2Ride Club';
+  } else if (lang === 'ang' || lang === 'en' || lang === 'EN') {
+    bannerImg.src = './images/rent2ride-club-banner-ang.jpg';
+    bannerImg.alt = 'Rent2Ride rider giving a thumbs up on a coastal road at sunset — Rent2Ride Club';
+  } else {
+    bannerImg.src = './images/rent2ride-club-banner-fr.jpg';
+    bannerImg.alt = 'Motard équipé Rent2Ride, pouce levé, sur une route côtière au coucher du soleil — Rent2Ride Club';
+  }
+}
+
 // Initialisation globale au chargement du DOM
 document.addEventListener("DOMContentLoaded", () => {
   initLangSwitcher();
