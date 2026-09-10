@@ -1567,3 +1567,9 @@ nav .nav-links a:not(.nav-cta) {
   align-items: center !important;
   line-height: 1 !important;
 }
+
+/* ===== LANG SWITCH - DRAPEAUX AGRANDIS ===== */
+.lang-switch button { 
+  font-size: 1.8rem;
+  padding: 8px 12px;
+}
